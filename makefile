@@ -7,7 +7,7 @@ STD=-std=c++17
 
 src=src/main.cc
 exe=build/test.exe
-prexe=build/cinit.exe
+prexe=build/cinit++.exe
 
 all: com 
 
