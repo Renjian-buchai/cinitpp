@@ -3,12 +3,16 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <string>
 
 int main(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  Init();
+  if (argc == 1)
+    return Init();
+  else
+    std::cout << "Usage:\n" << std::string(argv[0]) << "\n";
 }
 
 int Init() {
