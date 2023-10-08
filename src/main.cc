@@ -9,11 +9,11 @@
 #include <vector>
 
 enum exitVal {
-  EXITsuccess,
-  EXITconfigFileCreationFailed,
-  EXITconfigJsonInvalid,
-  EXITfileCreationFailed,
-  EXITdirCreationFailed
+  success,
+  configFileCreationFailed,
+  configJsonInvalid,
+  fileCreationFailed,
+  dirCreationFailed
 };
 
 int main(int argc, char** argv) {
@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
     std::cout << "Usage:\n" << std::string(argv[0]) << "\n";
   }
 
-  return exitVal::EXITsuccess;
+  return exitVal::success;
 }
 
 auto rdConfig() {
@@ -38,14 +38,14 @@ auto rdConfig() {
 
     if (nlohmann::json::accept(ret)) {
       std::cerr << "Invalid JSON. Stop fucking around with it manually.\n";
-      std::exit(exitVal::EXITconfigJsonInvalid);
+      std::exit(exitVal::configJsonInvalid);
     }
   } else {
     std::ofstream{"~/.cinitppConfig.json"};
 
     if (!std::filesystem::exists("~/.cinitppConfig.json")) {
       std::cerr << "Unable to generate config file. Try using sudo mode.\n";
-      std::exit(exitVal::EXITconfigFileCreationFailed);
+      std::exit(exitVal::configFileCreationFailed);
     }
   }
 
@@ -59,32 +59,32 @@ int Init() {
   fileSystem::create_directory("./build");
   if (!fileSystem::exists("./build")) {
     std::cout << "3";
-    return exitVal::EXITdirCreationFailed;
+    return exitVal::dirCreationFailed;
   }
 
   fileSystem::create_directory("./src");
   if (!fileSystem::exists("./src")) {
     std::cout << "1.1";
-    return exitVal::EXITfileCreationFailed;
+    return exitVal::fileCreationFailed;
   }
 
   fileSystem::create_directory("./include");
   if (!fileSystem::exists("./include")) {
     std::cout << "2.2";
-    return exitVal::EXITfileCreationFailed;
+    return exitVal::fileCreationFailed;
   }
 
   std::ofstream file{"makefile"};
   if (!file.is_open()) {
     std::cout << "4";
-    return exitVal::EXITfileCreationFailed;
+    return exitVal::fileCreationFailed;
   }
   file.close();
 
   file.open("./src/main.cc");
   if (!file.is_open()) {
     std::cout << "1";
-    return exitVal::EXITfileCreationFailed;
+    return exitVal::fileCreationFailed;
   }
   file << "int main(int argc, const char** argv) {}\n";
   file.close();
