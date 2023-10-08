@@ -1,7 +1,7 @@
 CC=g++ 
 CCFLAGS=-Wall -Wextra -Werror 
 INC=-I./include/
-LIN=
+LIN=-ljsoncpp
 DEF=
 STD=-std=c++17
 
