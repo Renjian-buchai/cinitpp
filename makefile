@@ -34,5 +34,6 @@ dbgr: $(exe)
 clear: 
 	rm -rf build/*
 
+# Doesn't work. 
 reset: 
 	rm -rf */ !*.exe
