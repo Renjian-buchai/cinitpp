@@ -1,5 +1,3 @@
-#include "../include/main.hh"
-
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -7,6 +5,8 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+#include "../include/file.hh"
 
 enum exitVal {
   success,
@@ -16,12 +16,20 @@ enum exitVal {
   dirCreationFailed
 };
 
+int Init(std::unordered_map<std::filesystem::path, std::vector<file>>& files);
+
 int main(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
+  std::unordered_map<std::filesystem::path, std::vector<file>> files{
+      {"build", {}},
+      {"src", {file("main.cc", "int main(int argc, char** argv) {}")}},
+      {"include", {}},
+      {".", {file("makefile")}}};
+
   if (argc == 1) {
-    return Init();
+    return Init(files);
   } else {
     std::cout << "Usage:\n" << std::string(argv[0]) << "\n";
   }
@@ -29,65 +37,28 @@ int main(int argc, char** argv) {
   return exitVal::success;
 }
 
-auto rdConfig() {
-  nlohmann::basic_json ret{};
-  std::ifstream config("~/.cinitppConfig.json");
-
-  if (config) {
-    config >> ret;
-
-    if (nlohmann::json::accept(ret)) {
-      std::cerr << "Invalid JSON. Stop fucking around with it manually.\n";
-      std::exit(exitVal::configJsonInvalid);
+int Init(std::unordered_map<std::filesystem::path, std::vector<file>>& files) {
+  for (auto it = files.begin(); it != files.end(); ++it) {
+    if (!std::filesystem::exists(it->first)) {
+      std::filesystem::create_directory(it->first);
     }
-  } else {
-    std::ofstream{"~/.cinitppConfig.json"};
 
-    if (!std::filesystem::exists("~/.cinitppConfig.json")) {
-      std::cerr << "Unable to generate config file. Try using sudo mode.\n";
-      std::exit(exitVal::configFileCreationFailed);
+    if (!std::filesystem::exists(it->first)) {
+      std::exit(exitVal::dirCreationFailed);
     }
+
+    std::for_each(it->second.begin(), it->second.end(),
+                  [&](file& paths) -> void {
+                    std::ofstream _file{it->first / paths.name};
+
+                    if (!std::filesystem::exists(it->first / paths.name)) {
+                      std::exit(exitVal::fileCreationFailed);
+                    }
+
+                    _file << paths.contents;
+                    _file.close();
+                  });
   }
 
-  return ret;
-}
-
-int Init() {
-  namespace fileSystem = std::filesystem;
-  int ret = 0;
-
-  fileSystem::create_directory("./build");
-  if (!fileSystem::exists("./build")) {
-    std::cout << "3";
-    return exitVal::dirCreationFailed;
-  }
-
-  fileSystem::create_directory("./src");
-  if (!fileSystem::exists("./src")) {
-    std::cout << "1.1";
-    return exitVal::fileCreationFailed;
-  }
-
-  fileSystem::create_directory("./include");
-  if (!fileSystem::exists("./include")) {
-    std::cout << "2.2";
-    return exitVal::fileCreationFailed;
-  }
-
-  std::ofstream file{"makefile"};
-  if (!file.is_open()) {
-    std::cout << "4";
-    return exitVal::fileCreationFailed;
-  }
-  file.close();
-
-  file.open("./src/main.cc");
-  if (!file.is_open()) {
-    std::cout << "1";
-    return exitVal::fileCreationFailed;
-  }
-  file << "int main(int argc, const char** argv) {}\n";
-  file.close();
-
-  return ret;
+  return exitVal::success;
 }

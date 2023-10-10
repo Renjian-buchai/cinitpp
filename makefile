@@ -5,7 +5,7 @@ LIN=-ljsoncpp
 DEF=
 STD=-std=c++17
 
-src=src/main.cc
+src=src/main.cc src/file.cc
 exe=build/test.exe
 prexe=build/cinitpp.exe
 
@@ -31,3 +31,8 @@ run: $(exe)
 dbgr: $(exe)
 	gdb $(exe)
 
+clear: 
+	rm -rf build/*
+
+reset: 
+	rm -rf */ !*.exe
