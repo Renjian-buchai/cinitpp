@@ -14,7 +14,6 @@ Initialise your C++ projects easily with cinitpp!
     - [Dependencies](#dependencies)
     - [Building](#building)
 
-
 ## License
 
 Copyright © 2023 Contributors
