@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "../include/external/nlohmann/json.hpp"
-#include "../include/file.hh"
+#include "../include/directoryItem.hh"
 
 enum exitVal {
   success,
@@ -16,17 +16,17 @@ enum exitVal {
   dirCreationFailed
 };
 
-int Init(std::unordered_map<std::filesystem::path, std::vector<file>>& files);
+int Init(std::unordered_map<std::filesystem::path, std::vector<directoryItem>>& files);
 
 int main(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  std::unordered_map<std::filesystem::path, std::vector<file>> files{
+  std::unordered_map<std::filesystem::path, std::vector<directoryItem>> files{
       {"build", {}},
-      {"src", {file("main.cc", "int main(int argc, char** argv) {}")}},
+      {"src", {directoryItem("main.cc", "int main(int argc, char** argv) {}")}},
       {"include", {}},
-      {".", {file("makefile")}}};
+      {".", {directoryItem("makefile")}}};
 
   if (argc == 1) {
     return Init(files);
@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
   return exitVal::success;
 }
 
-int Init(std::unordered_map<std::filesystem::path, std::vector<file>>& files) {
+int Init(std::unordered_map<std::filesystem::path, std::vector<directoryItem>>& files) {
   for (auto it = files.begin(); it != files.end(); ++it) {
     if (!std::filesystem::exists(it->first)) {
       std::filesystem::create_directory(it->first);
@@ -48,15 +48,15 @@ int Init(std::unordered_map<std::filesystem::path, std::vector<file>>& files) {
     }
 
     std::for_each(it->second.begin(), it->second.end(),
-                  [&](file& paths) -> void {
-                    std::ofstream _file{it->first / paths.name};
+                  [&](directoryItem& paths) -> void {
+                    std::ofstream _directoryItem{it->first / paths.name};
 
                     if (!std::filesystem::exists(it->first / paths.name)) {
                       std::exit(exitVal::fileCreationFailed);
                     }
 
-                    _file << paths.contents;
-                    _file.close();
+                    _directoryItem << paths.contents;
+                    _directoryItem.close();
                   });
   }
 
