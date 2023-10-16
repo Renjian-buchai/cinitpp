@@ -39,7 +39,10 @@ cinitpp
 
 ### Dependencies
 
-None as of now. Currently working on making it save data using [nlohmann/json](https://github.com/nlohmann/json).
+- [nlohmann/json](https://github.com/nlohmann/json).
+  - Version 3.11.2-1
+  - Included in [include/external/](https://github.com/Renjian-buchai/cinitpp/blob/main/include/external)
+    <!-- As of the branch, does not work. Wait for it to be merged sooner or later.-->
 
 ### Building
 

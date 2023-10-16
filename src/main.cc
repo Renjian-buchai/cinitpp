@@ -1,11 +1,11 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <nlohmann/json.hpp>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
+#include "../include/external/nlohmann/json.hpp"
 #include "../include/file.hh"
 
 enum exitVal {
