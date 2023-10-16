@@ -16,20 +16,20 @@ enum exitVal {
   dirCreationFailed
 };
 
-int Init(std::unordered_map<std::filesystem::path, std::vector<directoryItem>>& files);
+int Init(std::vector<directoryItem>& directoryStructure);
 
 int main(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  std::unordered_map<std::filesystem::path, std::vector<directoryItem>> files{
-      {"build", {}},
-      {"src", {directoryItem("main.cc", "int main(int argc, char** argv) {}")}},
-      {"include", {}},
-      {".", {directoryItem("makefile")}}};
+  std::vector<directoryItem> directoryStructure{
+      directoryItem("./build/"),
+      directoryItem("./src/main.cc", "int main(int argc, char** argv) {}"),
+      directoryItem("./include/"),
+      directoryItem("./makefile")};
 
   if (argc == 1) {
-    return Init(files);
+    return Init(directoryStructure);
   } else {
     std::cout << "Usage:\n" << std::string(argv[0]) << "\n";
   }
@@ -37,27 +37,33 @@ int main(int argc, char** argv) {
   return exitVal::success;
 }
 
-int Init(std::unordered_map<std::filesystem::path, std::vector<directoryItem>>& files) {
-  for (auto it = files.begin(); it != files.end(); ++it) {
-    if (!std::filesystem::exists(it->first)) {
-      std::filesystem::create_directory(it->first);
+int Init(std::vector<directoryItem>& directoryStructure) {
+  for (auto it = directoryStructure.begin(); it != directoryStructure.end(); ++it) {
+    if (std::filesystem::exists(it->name)) {
+      continue;
     }
 
-    if (!std::filesystem::exists(it->first)) {
-      std::exit(exitVal::dirCreationFailed);
+    if (it->name.string().back() == '/') { //represents an empty directory
+      it->name = it->name.parent_path(); //remove trailing '/'
+
+      std::filesystem::create_directories(it->name);
+      if (!std::filesystem::exists(it->name)) {
+        return exitVal::dirCreationFailed;
+      }
+    } else {                      //represents a file
+      std::filesystem::create_directories(it->name.parent_path());
+      if (!std::filesystem::exists(it->name.parent_path())) {
+        return exitVal::dirCreationFailed;
+      }
+
+      std::ofstream file{it->name};
+      if(!file.is_open()) {
+        return exitVal::fileCreationFailed;
+      }
+
+      file << it->contents;
+      file.close();
     }
-
-    std::for_each(it->second.begin(), it->second.end(),
-                  [&](directoryItem& paths) -> void {
-                    std::ofstream _directoryItem{it->first / paths.name};
-
-                    if (!std::filesystem::exists(it->first / paths.name)) {
-                      std::exit(exitVal::fileCreationFailed);
-                    }
-
-                    _directoryItem << paths.contents;
-                    _directoryItem.close();
-                  });
   }
 
   return exitVal::success;
