@@ -10,69 +10,72 @@
 
 enum exitVal {
   success,
+  nonEmptyDir,
   configFileCreationFailed,
   configJsonInvalid,
   fileCreationFailed,
   dirCreationFailed,
-  nonEmptyDir,
+  deletionFailed,
   testerr
 };
 
-int Init(std::vector<directoryItem>& directoryStructure);
+int Init(std::vector<directoryItem>&, std::error_code&);
 
 int main(int argc, char** argv) {
+  std::error_code err{};
+
   (void)argc;
   (void)argv;
+  (void)err;
 
   std::vector<directoryItem> directoryStructure{
       directoryItem("./build/"),
       directoryItem("./src/main.cc", "int main(int argc, char** argv) {}"),
       directoryItem("./include/external/"), directoryItem("./makefile")};
 
-  if (!std::filesystem::is_empty(".")) {
-    std::cerr << "Unable to initialise in a non-empty repository.\n"
-                 "This will not be because you have initialised a git\n"
-                 "repository prior to running this program.\n";
+  // Ignores .git because it's considered a hidden directory.
+  if (!std::filesystem::is_empty(".", err)) {
+    std::cerr << "Unable to initialise in a non-empty repository.\n";
     return exitVal::nonEmptyDir;
   }
 
   if (argc == 1) {
-    uint8_t err = Init(directoryStructure);
+    uint8_t errorNumber = Init(directoryStructure, err);
 
-    if (err) {
+    // Deletes all files if an error occurs.
+    if (errorNumber) {
       for (auto& dirEntry :
            std::filesystem::recursive_directory_iterator(".")) {
-        std::filesystem::remove_all(dirEntry.path());
+        if (!std::filesystem::remove_all(dirEntry.path(), err)) {
+          std::cerr << err.message();
+          return exitVal::deletionFailed;
+        }
       }
     }
 
-  } else {
-    std::cout << "Usage:\n" << std::string(argv[0]) << "\n";
+    return errorNumber;
   }
+
+  std::cout << "Usage:\n" << std::string(argv[0]) << "\n";
 
   return exitVal::success;
 }
 
-int Init(std::vector<directoryItem>& directoryStructure) {
-  for (auto it = directoryStructure.begin(); it != directoryStructure.end();
-       ++it) {
+int Init(std::vector<directoryItem>& directoryStructure, std::error_code& err) {
+  for (std::vector<directoryItem>::iterator it = directoryStructure.begin();
+       it != directoryStructure.end(); ++it) {
     if (std::filesystem::exists(it->name)) {
       continue;
     }
 
     if (it->name.string().back() == '/') {  // represents an empty directory
-
-      try {
-        std::filesystem::create_directories(it->name);
-      } catch (std::filesystem::filesystem_error& fe) {
-        std::cerr << fe.what();
+      if (!std::filesystem::create_directories(it->name, err)) {
+        std::cerr << err.message();
         return exitVal::dirCreationFailed;
       }
     } else {  // represents a file
-
-      try {
-        std::filesystem::create_directories(it->name.parent_path());
-      } catch (std::filesystem::filesystem_error& fe) {
+      if (!std::filesystem::create_directories(it->name.parent_path(), err)) {
+        std::cerr << err.message();
         return exitVal::dirCreationFailed;
       }
 
@@ -80,12 +83,13 @@ int Init(std::vector<directoryItem>& directoryStructure) {
         std::ofstream file{it->name};
         file << it->contents;
         file.close();
-      } catch (std::filesystem::filesystem_error& fe) {
+      }
+      // Can't recall what error is thrown, so just catch a generic one.
+      catch (std::exception& fe) {
         std::cerr << fe.what();
         return exitVal::fileCreationFailed;
       }
     }
   }
-
   return exitVal::success;
 }
