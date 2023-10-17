@@ -14,17 +14,17 @@ all: com
 dbg: dbgc 
 
 prod: $(src) 
-	mkdir -p build
+	mkdir -p build/test
 	rm -f $(prexe) 
 	$(CC) $(CCFLAGS) -o$(prexe) $(src) $(INC) $(LIN) $(DEF) $(STD) -O3
 
 com: $(src)
-	mkdir -p build
+	mkdir -p build/test
 	rm -f $(exe)
 	$(CC) $(CCFLAGS) -o$(exe) $(src) $(INC) $(LIN) $(DEF) $(STD)
 
 dbgc: $(src) 
-	mkdir -p build
+	mkdir -p build/test
 	rm -f $(exe)
 	$(CC) $(CCFLAGS) -o$(exe) $(src) $(INC) $(LIN) $(DEF) $(STD) -g3 
 
@@ -40,6 +40,6 @@ clear:
 reset: 
 	mkdir tmp
 	cp build/*.exe tmp 
-	rm -rf build/* 
+	rm -rf build/test/* 
 	cp tmp/*.exe build
 	rm -rf tmp

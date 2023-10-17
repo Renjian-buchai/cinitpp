@@ -13,7 +13,9 @@ enum exitVal {
   configFileCreationFailed,
   configJsonInvalid,
   fileCreationFailed,
-  dirCreationFailed
+  dirCreationFailed,
+  nonEmptyDir,
+  testerr
 };
 
 int Init(std::vector<directoryItem>& directoryStructure);
@@ -27,8 +29,23 @@ int main(int argc, char** argv) {
       directoryItem("./src/main.cc", "int main(int argc, char** argv) {}"),
       directoryItem("./include/external/"), directoryItem("./makefile")};
 
+  if (!std::filesystem::is_empty(".")) {
+    std::cerr << "Unable to initialise in a non-empty repository.\n"
+                 "This will not be because you have initialised a git\n"
+                 "repository prior to running this program.\n";
+    return exitVal::nonEmptyDir;
+  }
+
   if (argc == 1) {
-    return Init(directoryStructure);
+    uint8_t err = Init(directoryStructure);
+
+    if (!err) {
+      for (auto& dirEntry :
+           std::filesystem::recursive_directory_iterator(".")) {
+        std::filesystem::remove(dirEntry);
+      }
+    }
+
   } else {
     std::cout << "Usage:\n" << std::string(argv[0]) << "\n";
   }
@@ -70,5 +87,5 @@ int Init(std::vector<directoryItem>& directoryStructure) {
     }
   }
 
-  return exitVal::success;
+  return exitVal::testerr;
 }
