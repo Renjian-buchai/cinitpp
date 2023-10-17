@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
   std::vector<directoryItem> directoryStructure{
       directoryItem("./build/"),
       directoryItem("./src/main.cc", "int main(int argc, char** argv) {}"),
-      directoryItem("./include/"), directoryItem("./makefile")};
+      directoryItem("./include/external/"), directoryItem("./makefile")};
 
   if (argc == 1) {
     return Init(directoryStructure);
@@ -44,25 +44,29 @@ int Init(std::vector<directoryItem>& directoryStructure) {
     }
 
     if (it->name.string().back() == '/') {  // represents an empty directory
-      it->name = it->name.parent_path();    // remove trailing '/'
 
-      std::filesystem::create_directories(it->name);
-      if (!std::filesystem::exists(it->name)) {
+      try {
+        std::filesystem::create_directories(it->name);
+      } catch (std::filesystem::filesystem_error& fe) {
+        std::cerr << fe.what();
         return exitVal::dirCreationFailed;
       }
     } else {  // represents a file
-      std::filesystem::create_directories(it->name.parent_path());
-      if (!std::filesystem::exists(it->name.parent_path())) {
+
+      try {
+        std::filesystem::create_directories(it->name.parent_path());
+      } catch (std::filesystem::filesystem_error& fe) {
         return exitVal::dirCreationFailed;
       }
 
-      std::ofstream file{it->name};
-      if (!file.is_open()) {
+      try {
+        std::ofstream file{it->name};
+        file << it->contents;
+        file.close();
+      } catch (std::filesystem::filesystem_error& fe) {
+        std::cerr << fe.what();
         return exitVal::fileCreationFailed;
       }
-
-      file << it->contents;
-      file.close();
     }
   }
 
