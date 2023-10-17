@@ -5,8 +5,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../include/external/nlohmann/json.hpp"
 #include "../include/directoryItem.hh"
+#include "../include/external/nlohmann/json.hpp"
 
 enum exitVal {
   success,
@@ -25,8 +25,7 @@ int main(int argc, char** argv) {
   std::vector<directoryItem> directoryStructure{
       directoryItem("./build/"),
       directoryItem("./src/main.cc", "int main(int argc, char** argv) {}"),
-      directoryItem("./include/"),
-      directoryItem("./makefile")};
+      directoryItem("./include/"), directoryItem("./makefile")};
 
   if (argc == 1) {
     return Init(directoryStructure);
@@ -38,26 +37,27 @@ int main(int argc, char** argv) {
 }
 
 int Init(std::vector<directoryItem>& directoryStructure) {
-  for (auto it = directoryStructure.begin(); it != directoryStructure.end(); ++it) {
+  for (auto it = directoryStructure.begin(); it != directoryStructure.end();
+       ++it) {
     if (std::filesystem::exists(it->name)) {
       continue;
     }
 
-    if (it->name.string().back() == '/') { //represents an empty directory
-      it->name = it->name.parent_path(); //remove trailing '/'
+    if (it->name.string().back() == '/') {  // represents an empty directory
+      it->name = it->name.parent_path();    // remove trailing '/'
 
       std::filesystem::create_directories(it->name);
       if (!std::filesystem::exists(it->name)) {
         return exitVal::dirCreationFailed;
       }
-    } else {                      //represents a file
+    } else {  // represents a file
       std::filesystem::create_directories(it->name.parent_path());
       if (!std::filesystem::exists(it->name.parent_path())) {
         return exitVal::dirCreationFailed;
       }
 
       std::ofstream file{it->name};
-      if(!file.is_open()) {
+      if (!file.is_open()) {
         return exitVal::fileCreationFailed;
       }
 
