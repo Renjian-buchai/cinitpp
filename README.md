@@ -42,7 +42,6 @@ cinitpp
 - [nlohmann/json](https://github.com/nlohmann/json).
   - Version 3.11.2-1
   - Included in [include/external/](https://github.com/Renjian-buchai/cinitpp/blob/main/include/external)
-    <!-- As of the branch, does not work. Wait for it to be merged sooner or later.-->
 
 ### Building
 
@@ -50,4 +49,5 @@ You can use the makefile as reference. TLDR:
 
 - Standard = C++17
 - Source = src/main.cc main.exe
+- Additional include paths = include/external
 - If possible, -Wall -Wextra -Werror (Though I wouldn't mind if there were warnings, I'd still attempt to correct them, so to save time, it'd be best to use all warnings)

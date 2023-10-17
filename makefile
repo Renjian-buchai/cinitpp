@@ -1,6 +1,6 @@
 CC=g++ 
 CCFLAGS=-Wall -Wextra -Werror 
-INC=-I./include/
+INC=-I./include/ -I./include/external
 LIN=
 DEF=
 STD=-std=c++17
@@ -14,14 +14,17 @@ all: com
 dbg: dbgc 
 
 prod: $(src) 
+	mkdir -p build
 	rm -f $(prexe) 
 	$(CC) $(CCFLAGS) -o$(prexe) $(src) $(INC) $(LIN) $(DEF) $(STD) -O3
 
 com: $(src)
+	mkdir -p build
 	rm -f $(exe)
 	$(CC) $(CCFLAGS) -o$(exe) $(src) $(INC) $(LIN) $(DEF) $(STD)
 
 dbgc: $(src) 
+	mkdir -p build
 	rm -f $(exe)
 	$(CC) $(CCFLAGS) -o$(exe) $(src) $(INC) $(LIN) $(DEF) $(STD) -g3 
 
@@ -34,6 +37,9 @@ dbgr: $(exe)
 clear: 
 	rm -rf build/*
 
-# Doesn't work. 
 reset: 
-	rm -rf */ !*.exe
+	mkdir tmp
+	cp build/*.exe tmp 
+	rm -rf build/* 
+	cp tmp/*.exe build
+	rm -rf tmp
