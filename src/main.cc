@@ -39,10 +39,10 @@ int main(int argc, char** argv) {
   if (argc == 1) {
     uint8_t err = Init(directoryStructure);
 
-    if (!err) {
+    if (err) {
       for (auto& dirEntry :
            std::filesystem::recursive_directory_iterator(".")) {
-        std::filesystem::remove(dirEntry);
+        std::filesystem::remove_all(dirEntry.path());
       }
     }
 
@@ -87,5 +87,5 @@ int Init(std::vector<directoryItem>& directoryStructure) {
     }
   }
 
-  return exitVal::testerr;
+  return exitVal::success;
 }
