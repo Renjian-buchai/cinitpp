@@ -8,6 +8,7 @@ enum exitVal {
   configJsonInvalid,
   fileCreationFailed,
   dirCreationFailed,
+  invalidJSON,
   deletionFailed,
   testerr
 };

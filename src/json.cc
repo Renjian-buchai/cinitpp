@@ -10,7 +10,7 @@ using json = nlohmann::json;
 
 uint8_t configOut(std::vector<directoryItem>& dirStructure,
                   std::error_code& err) {
-  if (!std::filesystem::create_directories("../.cinitpp/", err)) {
+  if (std::filesystem::create_directories("../.cinitpp/", err)) {
     return exitVal::dirCreationFailed;
   }
 
@@ -20,6 +20,7 @@ uint8_t configOut(std::vector<directoryItem>& dirStructure,
   }
 
   std::string configStr{"{\n"};
+
   for (auto it = dirStructure.cbegin(); it != dirStructure.cend() - 1; ++it) {
     configStr +=
         "   \"" + it->name.string() + "\": \"" + it->contents + "\",\n";
@@ -27,7 +28,12 @@ uint8_t configOut(std::vector<directoryItem>& dirStructure,
   configStr += "   \"" + dirStructure.crbegin()->name.string() + "\": \"" +
                dirStructure.crbegin()->contents + "\"\n}";
 
+  if (!json::accept(configStr)) {
+    std::cerr << "Somehow the config is not valid JSON.\n";
+    return exitVal::invalidJSON;
+  }
+
   config << configStr;
   config.close();
-  return true;
+  return exitVal::success;
 }

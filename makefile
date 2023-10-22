@@ -40,6 +40,6 @@ clear:
 reset: 
 	mkdir tmp
 	cp build/*.exe tmp 
-	rm -rf build/test/* 
+	rm -rf build/test build/.cinitpp 
 	cp tmp/*.exe build
 	rm -rf tmp
