@@ -6,56 +6,51 @@
 #include <vector>
 
 #include "../include/directoryItem.hh"
+#include "../include/enum.hh"
+#include "../include/errHandler.hh"
 #include "../include/external/nlohmann/json.hpp"
+#include "../include/json.hh"
 
-enum exitVal {
-  success,
-  configFileCreationFailed,
-  configJsonInvalid,
-  fileCreationFailed,
-  dirCreationFailed,
-  nonEmptyDir,
-  copySrcNotADir,
-  parseFileOpeningFailed,
-  testerr
-};
-
-int Init(std::vector<directoryItem>& directoryStructure);
-int ParseDir(std::filesystem::path dirToParse, std::vector<directoryItem> *target);
+int Init(std::vector<directoryItem>&, std::error_code&);
+int ParseDir(std::filesystem::path dirToParse,
+             std::vector<directoryItem>* target);
 int ParseItem(std::filesystem::path itemToParse, std::filesystem::path srcDir,
-                std::vector<directoryItem> *target);
+              std::vector<directoryItem>* target);
 
 int main(int argc, char** argv) {
+  std::error_code err{};
+
+  (void)argc;
+  (void)argv;
+  (void)err;
+
   std::vector<directoryItem> directoryStructure{
       directoryItem("build/"),
       directoryItem("src/main.cc", "int main(int argc, char** argv) {}"),
       directoryItem("include/external/"), directoryItem("./makefile")};
 
-  if (!std::filesystem::is_empty(".")) {
-    std::cerr << "Unable to initialise in a non-empty repository.\n"
-                 "This will not be because you have initialised a git\n"
-                 "repository prior to running this program.\n";
+  // Ignores .git because it's considered a hidden directory.
+  if (!std::filesystem::is_empty(".", err)) {
+    std::cerr << "Unable to initialise in a non-empty repository.\n";
     return exitVal::nonEmptyDir;
   }
 
-  uint8_t err;
+  configOut(directoryStructure, err);
+
+  uint8_t errNumber;
   switch (argc) {
     case 2:
       directoryStructure.clear();
-      err = ParseDir(argv[1], &directoryStructure);
-      if (err) {
-        return err;
+      errNumber = ParseDir(argv[1], &directoryStructure);
+      if (errNumber) {
+        return errNumber;
       }
       [[fallthrough]];
 
-    case 1:  
-      err = Init(directoryStructure);
-      if (err) {
-        for (auto& dirEntry :
-             std::filesystem::recursive_directory_iterator(".")) {
-          std::filesystem::remove_all(dirEntry.path());
-        }
-      }
+    case 1:
+      errNumber = Init(directoryStructure, err);
+      reset(errNumber, err);
+      errNumber = configOut(directoryStructure, err);
       break;
 
     default:
@@ -67,9 +62,9 @@ int main(int argc, char** argv) {
   return exitVal::success;
 }
 
-int Init(std::vector<directoryItem>& directoryStructure) {
-  for (auto it = directoryStructure.begin(); it != directoryStructure.end();
-       ++it) {
+int Init(std::vector<directoryItem>& directoryStructure, std::error_code& err) {
+  for (std::vector<directoryItem>::iterator it = directoryStructure.begin();
+       it != directoryStructure.end(); ++it) {
     it->name = std::filesystem::current_path() / it->name;
 
     if (std::filesystem::exists(it->name)) {
@@ -77,26 +72,25 @@ int Init(std::vector<directoryItem>& directoryStructure) {
     }
 
     if (it->name.string().back() == '/') {  // represents an empty directory
-
-      try {
-        std::filesystem::create_directories(it->name);
-      } catch (std::filesystem::filesystem_error& fe) {
-        std::cerr << fe.what();
+      if (!std::filesystem::create_directories(it->name, err)) {
+        std::cerr << err.message();
         return exitVal::dirCreationFailed;
       }
     } else {  // represents a file
-
-      try {
-        std::filesystem::create_directories(it->name.parent_path());
-      } catch (std::filesystem::filesystem_error& fe) {
-        return exitVal::dirCreationFailed;
+      if (!std::filesystem::exists(it->name.parent_path(), err)) {
+        if (!std::filesystem::create_directories(it->name.parent_path(), err)) {
+          std::cerr << err.message();
+          return exitVal::dirCreationFailed;
+        }
       }
 
       try {
         std::ofstream file{it->name};
         file << it->contents;
         file.close();
-      } catch (std::filesystem::filesystem_error& fe) {
+      }
+      // Can't recall what error is thrown, so just catch a generic one.
+      catch (std::exception& fe) {
         std::cerr << fe.what();
         return exitVal::fileCreationFailed;
       }
@@ -106,7 +100,8 @@ int Init(std::vector<directoryItem>& directoryStructure) {
   return exitVal::success;
 }
 
-int ParseDir(std::filesystem::path dirToParse, std::vector<directoryItem> *target) {
+int ParseDir(std::filesystem::path dirToParse,
+             std::vector<directoryItem>* target) {
   if (!std::filesystem::is_directory(dirToParse)) {
     return exitVal::copySrcNotADir;
   }
@@ -122,7 +117,8 @@ int ParseDir(std::filesystem::path dirToParse, std::vector<directoryItem> *targe
   return exitVal::success;
 }
 
-int ParseItem(std::filesystem::path itemToParse, std::filesystem::path srcDir, std::vector<directoryItem> *target) {
+int ParseItem(std::filesystem::path itemToParse, std::filesystem::path srcDir,
+              std::vector<directoryItem>* target) {
   uint8_t err;
   if (!std::filesystem::is_directory(itemToParse)) {
     target->push_back({});
@@ -131,25 +127,26 @@ int ParseItem(std::filesystem::path itemToParse, std::filesystem::path srcDir, s
     if (!file.is_open()) {
       return exitVal::parseFileOpeningFailed;
     }
-    target->back().contents = std::string(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
+    target->back().contents = std::string(std::istreambuf_iterator<char>(file),
+                                          std::istreambuf_iterator<char>());
     file.close();
 
-  } else { //is a directory
+  } else {  // is a directory
     if (std::filesystem::is_empty(itemToParse)) {
       target->push_back({});
-      target->back().name = (std::filesystem::relative(itemToParse, srcDir)).string() + "/";
+      target->back().name =
+          (std::filesystem::relative(itemToParse, srcDir)).string() + "/";
       target->back().contents = "";
 
     } else {
-      for (const auto& entry : std::filesystem::directory_iterator(itemToParse)) {
+      for (const auto& entry :
+           std::filesystem::directory_iterator(itemToParse)) {
         err = ParseItem(entry.path(), srcDir, target);
-	if (err) {
-	  return err;
-	}
+        if (err) {
+          return err;
+        }
       }
-
     }
   }
-
   return exitVal::success;
-} 
+}

@@ -8,15 +8,15 @@ class directoryItem {
  protected:
  public:
   directoryItem();
-  directoryItem(std::filesystem::path _name);
-  directoryItem(std::filesystem::path _name, std::string _contents);
+  directoryItem(std::filesystem::path&& _name);
+  directoryItem(std::filesystem::path&& _name, std::string&& _contents);
 
-  std::filesystem::path name;  // If the name ends with a '/',
-                               // this item is an empty directory.
-                               // Otherwise, this item is a file.
+  /// @brief Full path of item
+  /// @note If it ends in '/', it's a directory.
+  std::filesystem::path name;
 
-  std::string contents;  // If this item is an empty directory,
-                         //'contents' is an empty std::string.
+  /// @brief Contents of initial file
+  std::string contents;
 };
 
 #endif

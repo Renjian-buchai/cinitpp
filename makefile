@@ -5,7 +5,7 @@ LIN=
 DEF=
 STD=-std=c++17
 
-src=src/main.cc src/directoryItem.cc
+src=src/main.cc src/directoryItem.cc src/json.cc src/errHandler.cc
 exe=build/test.exe
 prexe=build/cinitpp.exe
 
@@ -40,6 +40,6 @@ clear:
 reset: 
 	mkdir tmp
 	cp build/*.exe tmp 
-	rm -rf build/test/* 
+	rm -rf build/test build/.cinitpp 
 	cp tmp/*.exe build
 	rm -rf tmp
