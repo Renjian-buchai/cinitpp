@@ -67,9 +67,11 @@ int Init(std::vector<directoryItem>& directoryStructure, std::error_code& err) {
         return exitVal::dirCreationFailed;
       }
     } else {  // represents a file
-      if (!std::filesystem::create_directories(it->name.parent_path(), err)) {
-        std::cerr << err.message();
-        return exitVal::dirCreationFailed;
+      if (!std::filesystem::exists(it->name.parent_path(), err)) {
+        if (!std::filesystem::create_directories(it->name.parent_path(), err)) {
+          std::cerr << err.message();
+          return exitVal::dirCreationFailed;
+        }
       }
 
       try {
