@@ -25,9 +25,9 @@ int main(int argc, char** argv) {
   (void)err;
 
   std::vector<directoryItem> directoryStructure{
-      directoryItem("build/"),
-      directoryItem("src/main.cc", "int main(int argc, char** argv) {}"),
-      directoryItem("include/external/"), directoryItem("./makefile")};
+      directoryItem("./build/"),
+      directoryItem("./src/main.cc", "int main(int argc, char** argv) {}"),
+      directoryItem("./include/external/"), directoryItem("./makefile")};
 
   // Ignores .git because it's considered a hidden directory.
   if (!std::filesystem::is_empty(".", err)) {
@@ -65,8 +65,6 @@ int main(int argc, char** argv) {
 int Init(std::vector<directoryItem>& directoryStructure, std::error_code& err) {
   for (std::vector<directoryItem>::iterator it = directoryStructure.begin();
        it != directoryStructure.end(); ++it) {
-    it->name = std::filesystem::current_path() / it->name;
-
     if (std::filesystem::exists(it->name)) {
       continue;
     }
