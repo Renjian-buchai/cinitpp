@@ -6,18 +6,9 @@
 #include <vector>
 
 #include "../include/directoryItem.hh"
+#include "../include/enum.hh"
 #include "../include/external/nlohmann/json.hpp"
-
-enum exitVal {
-  success,
-  nonEmptyDir,
-  configFileCreationFailed,
-  configJsonInvalid,
-  fileCreationFailed,
-  dirCreationFailed,
-  deletionFailed,
-  testerr
-};
+#include "../include/json.hh"
 
 int Init(std::vector<directoryItem>&, std::error_code&);
 
@@ -32,6 +23,8 @@ int main(int argc, char** argv) {
       directoryItem("./build/"),
       directoryItem("./src/main.cc", "int main(int argc, char** argv) {}"),
       directoryItem("./include/external/"), directoryItem("./makefile")};
+
+  configOut(directoryStructure, err);
 
   // Ignores .git because it's considered a hidden directory.
   if (!std::filesystem::is_empty(".", err)) {

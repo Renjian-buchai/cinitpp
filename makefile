@@ -5,7 +5,7 @@ LIN=
 DEF=
 STD=-std=c++17
 
-src=src/main.cc src/directoryItem.cc
+src=src/main.cc src/directoryItem.cc src/json.cc
 exe=build/test.exe
 prexe=build/cinitpp.exe
 
