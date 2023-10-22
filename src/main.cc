@@ -7,6 +7,7 @@
 
 #include "../include/directoryItem.hh"
 #include "../include/enum.hh"
+#include "../include/errHandler.hh"
 #include "../include/external/nlohmann/json.hpp"
 #include "../include/json.hh"
 
@@ -24,29 +25,22 @@ int main(int argc, char** argv) {
       directoryItem("./src/main.cc", "int main(int argc, char** argv) {}"),
       directoryItem("./include/external/"), directoryItem("./makefile")};
 
-  configOut(directoryStructure, err);
-
   // Ignores .git because it's considered a hidden directory.
   if (!std::filesystem::is_empty(".", err)) {
     std::cerr << "Unable to initialise in a non-empty repository.\n";
     return exitVal::nonEmptyDir;
   }
 
+  configOut(directoryStructure, err);
+
   if (argc == 1) {
     uint8_t errorNumber = Init(directoryStructure, err);
+    reset(errorNumber, err);
 
-    // Deletes all files if an error occurs.
-    if (errorNumber) {
-      for (auto& dirEntry :
-           std::filesystem::recursive_directory_iterator(".")) {
-        if (!std::filesystem::remove_all(dirEntry.path(), err)) {
-          std::cerr << err.message();
-          return exitVal::deletionFailed;
-        }
-      }
-    }
+    errorNumber = configOut(directoryStructure, err);
+    reset(errorNumber, err);
 
-    return errorNumber;
+    return exitVal::success;
   }
 
   std::cout << "Usage:\n" << std::string(argv[0]) << "\n";
