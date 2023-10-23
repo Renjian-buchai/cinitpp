@@ -29,17 +29,10 @@ uint8_t configOut(std::vector<directoryItem>& dirStructure,
   configStr += "   \"" + dirStructure.crbegin()->name.string() + "\": \"" +
                dirStructure.crbegin()->contents + "\"\n}";
 
-  // for (auto i = configStr.begin(); i != configStr.end(); ++i) {
-  //   if (*i == '\\') {
-  //     *i = 0x07;
-  //   }
-  // }
-  // configStr = std::regex_replace(
-  //     configStr, std::regex(std::to_string((char)0x07)), "\\\\");
+  // Matches '\\' and replaces with "\\\\". It does not match "RX(\)RX"
+  // and replaces it with "\\\\".
+  configStr = std::regex_replace(configStr, std::regex(R"RX(\\)RX"), "\\\\");
 
-  configStr = std::regex_replace(configStr, std::regex("\\\\"), "\\\\");
-
-  std::cout << configStr;
   config << configStr;
   if (!json::accept(configStr)) {
     std::cerr << "Somehow the config is not valid JSON.\n";
