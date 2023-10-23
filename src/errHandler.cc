@@ -7,7 +7,8 @@
 
 void reset(uint8_t errNumber, std::error_code& err) {
   if (errNumber) {
-    for (auto& dirEntry : std::filesystem::recursive_directory_iterator(".")) {
+    for (const auto& dirEntry :
+         std::filesystem::recursive_directory_iterator(".")) {
       if (!std::filesystem::remove_all(dirEntry.path(), err)) {
         std::cerr << err.message();
         std::exit(exitVal::deletionFailed);

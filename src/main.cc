@@ -10,12 +10,9 @@
 #include "../include/errHandler.hh"
 #include "../include/external/nlohmann/json.hpp"
 #include "../include/json.hh"
+#include "../include/parse.hh"
 
 int Init(std::vector<directoryItem>&, std::error_code&);
-int ParseDir(std::filesystem::path dirToParse,
-             std::vector<directoryItem>* target);
-int ParseItem(std::filesystem::path itemToParse, std::filesystem::path srcDir,
-              std::vector<directoryItem>* target);
 
 int main(int argc, char** argv) {
   std::error_code err{};
@@ -35,14 +32,13 @@ int main(int argc, char** argv) {
     return exitVal::nonEmptyDir;
   }
 
-  configOut(directoryStructure, err);
-
   uint8_t errNumber;
   switch (argc) {
     case 2:
       directoryStructure.clear();
-      errNumber = ParseDir(argv[1], &directoryStructure);
+      errNumber = ParseDir(argv[1], directoryStructure, err);
       if (errNumber) {
+        std::cout << errNumber;
         return errNumber;
       }
       [[fallthrough]];
@@ -51,6 +47,7 @@ int main(int argc, char** argv) {
       errNumber = Init(directoryStructure, err);
       reset(errNumber, err);
       errNumber = configOut(directoryStructure, err);
+      reset(errNumber, err);
       break;
 
     default:
@@ -59,6 +56,7 @@ int main(int argc, char** argv) {
       break;
   }
 
+  std::cout << errNumber;
   return exitVal::success;
 }
 
@@ -95,56 +93,5 @@ int Init(std::vector<directoryItem>& directoryStructure, std::error_code& err) {
     }
   }
 
-  return exitVal::success;
-}
-
-int ParseDir(std::filesystem::path dirToParse,
-             std::vector<directoryItem>* target) {
-  if (!std::filesystem::is_directory(dirToParse)) {
-    return exitVal::copySrcNotADir;
-  }
-
-  uint8_t err;
-  for (const auto& entry : std::filesystem::directory_iterator(dirToParse)) {
-    err = ParseItem(entry.path(), dirToParse, target);
-    if (err) {
-      return err;
-    }
-  }
-
-  return exitVal::success;
-}
-
-int ParseItem(std::filesystem::path itemToParse, std::filesystem::path srcDir,
-              std::vector<directoryItem>* target) {
-  uint8_t err;
-  if (!std::filesystem::is_directory(itemToParse)) {
-    target->push_back({});
-    target->back().name = std::filesystem::relative(itemToParse, srcDir);
-    std::ifstream file{itemToParse};
-    if (!file.is_open()) {
-      return exitVal::parseFileOpeningFailed;
-    }
-    target->back().contents = std::string(std::istreambuf_iterator<char>(file),
-                                          std::istreambuf_iterator<char>());
-    file.close();
-
-  } else {  // is a directory
-    if (std::filesystem::is_empty(itemToParse)) {
-      target->push_back({});
-      target->back().name =
-          (std::filesystem::relative(itemToParse, srcDir)).string() + "/";
-      target->back().contents = "";
-
-    } else {
-      for (const auto& entry :
-           std::filesystem::directory_iterator(itemToParse)) {
-        err = ParseItem(entry.path(), srcDir, target);
-        if (err) {
-          return err;
-        }
-      }
-    }
-  }
   return exitVal::success;
 }
