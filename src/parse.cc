@@ -10,12 +10,32 @@ int ParseDir(std::filesystem::path dirToParse,
     return exitVal::copySrcNotADir;
   }
 
-  uint8_t errNumber;
-  for (const auto& entry :
+  std::ifstream file;
+
+  for (const std::filesystem::directory_entry& entry :
        std::filesystem::recursive_directory_iterator(dirToParse)) {
-    errNumber = ParseItem(entry.path(), dirToParse, target, err);
-    if (errNumber) {
-      return errNumber;
+    if (!std::filesystem::is_directory(entry)) {  // Not a dir (i.e. a file)
+      target.push_back({"." / std::filesystem::relative(entry, dirToParse)});
+
+      file.open(entry.path());
+      if (!file.is_open()) {
+        return exitVal::parseFileOpeningFailed;
+      }
+
+      target.back().contents = std::string(std::istreambuf_iterator(file),
+                                           std::istreambuf_iterator<char>());
+
+      file.close();
+    } else {
+      target.push_back({
+        static_cast<std::filesystem::path>(
+            ("." / std::filesystem::relative(entry, dirToParse)).string() +
+#if defined(_WIN32) || defined(_WIN64)
+            "\\"),
+#else
+            "/"),
+#endif
+      });
     }
   }
 

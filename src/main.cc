@@ -67,13 +67,15 @@ int Init(std::vector<directoryItem>& directoryStructure, std::error_code& err) {
       continue;
     }
 
-    if (it->name.string().back() == '/') {  // represents an empty directory
+    if (it->name.string().back() == '/' ||
+        it->name.string().back() == '\\') {  // represents an empty directory
       if (!std::filesystem::create_directories(it->name, err)) {
         std::cerr << err.message();
         return exitVal::dirCreationFailed;
       }
     } else {  // represents a file
-      if (!std::filesystem::exists(it->name.parent_path(), err)) {
+      if (!std::filesystem::exists(it->name.parent_path(), err) &&
+          it->name.parent_path().empty()) {
         if (!std::filesystem::create_directories(it->name.parent_path(), err)) {
           std::cerr << err.message();
           return exitVal::dirCreationFailed;
