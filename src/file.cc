@@ -5,3 +5,7 @@ file::file(const std::filesystem::path path)
 
 file::file(const std::filesystem::path path, const std::string contents)
     : filePath(path), _contents(contents) {}
+
+const std::filesystem::path& file::path() { return filePath; }
+
+const std::string& file::contents() { return _contents; }
