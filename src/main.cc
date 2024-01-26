@@ -1,5 +1,11 @@
 #include <cstdint>
+#include <fstream>
+#include <queue>
 #include <string>
+#include <variant>
+
+#include "../include/dir.hh"
+#include "../include/file.hh"
 
 enum class flag_t : uint8_t {
   // Input run, i.e. don't run cinitpp
@@ -33,12 +39,12 @@ int main(int argc, const char** argv) {
 
     default:
       for (int i = 1; i < argc; ++i) {
-        if (argv[i] == "-I") {
+        if (std::string(argv[i]) == "-I") {
           buffer = argv[++i];
           flipTrue(flags, flag_t::input);
         }
 
-        else if (argv[i] == "-F") {
+        else if (std::string(argv[i]) == "-F") {
           flipTrue(flags, flag_t::force);
         }
       }
@@ -50,6 +56,21 @@ int main(int argc, const char** argv) {
 
   if (!checkTrue(flags, flag_t::force)) {
     // Check if dir is empty
+  }
+
+  using filesystem_t = std::variant<directory, file>;
+
+  directory root{nullptr, "./"};
+  root._inDir = {file{"makefile"}};
+  directory* currDir = &root;
+
+  uint8_t running = 1;
+
+  while (running) {
+    for (auto it = currDir->_inDir.begin(); it != currDir->_inDir.end(); ++it) {
+      if (std::holds_alternative<directory>(*it)) {
+            }
+    }
   }
 
   return 0;

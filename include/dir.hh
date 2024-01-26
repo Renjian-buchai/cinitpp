@@ -12,6 +12,7 @@ class directory {
 
   directory() = delete;
   directory(directory* prev, std::filesystem::path path);
+  directory(const directory& _directory);
 
   const std::filesystem::path& path();
   const directory* prev();
@@ -19,8 +20,8 @@ class directory {
   std::vector<filesystem_t> _inDir;
 
  protected:
-  std::filesystem::path _path;
   directory* _prev;
+  std::filesystem::path _path;
 };
 
 #endif
