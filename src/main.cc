@@ -26,6 +26,7 @@ uint8_t checkTrue(uint8_t flags, flag_t flag) {
   return flags & (1 << static_cast<uint8_t>(flag));
 }
 
+// Don't touch
 void recurse(const directory* currDir) {
   static std::ofstream fstr;
   // using filesystem_t = std::variant<directory, file>;
