@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <fstream>
+#include <iostream>
 #include <queue>
 #include <string>
 #include <variant>
@@ -71,11 +72,15 @@ int main(int argc, const char** argv) {
   }
 
   if (checkTrue(flags, flag_t::input)) {
-    // validate buffer, then somehow turn it into a vector
   }
 
   if (!checkTrue(flags, flag_t::force)) {
-    // Check if dir is empty
+    if (!std::filesystem::is_empty(std::filesystem::current_path())) {
+      std::cerr << "Unable to initialise in a non-empty directory. To force "
+                   "the initialisation, use the flag `-f`.\n"
+                   "The .git/ folder is also not allowed.";
+      return 1;
+    }
   }
 
   // using filesystem_t = std::variant<directory, file>;
