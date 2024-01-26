@@ -35,6 +35,7 @@ void recurse(const directory* currDir) {
     if (std::holds_alternative<directory>(currDir->_inDir[i])) {
       std::filesystem::create_directories(
           std::get_if<directory>(&(currDir->_inDir[i]))->_path);
+
       recurse(std::get_if<directory>(&(currDir->_inDir[i])));
     } else {
       fstr.open(currDir->_path /
@@ -85,8 +86,12 @@ int main(int argc, const char** argv) {
 
   // using filesystem_t = std::variant<directory, file>;
 
-  directory root{nullptr, "./"};
-  root._inDir = {file{"makefile"}, directory{&root, "./aoeu"}};
+  /**
+   * @note All directories must contain the relative path from the root
+   * directory, all files should just contain its name.
+   */
+  directory root{"./"};
+  root._inDir = {file{"makefile"}, directory{"./aoeu"}};
   std::get_if<directory>(&root._inDir[1])->_inDir = {
       file{"Wtf", "aoeuaoeuaoeu"}};
   directory* currDir = &root;
