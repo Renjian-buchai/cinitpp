@@ -1,4 +1,4 @@
-# Cinitpp
+# cinitpp
 
 Initialise your C++ projects easily with cinitpp!
 
@@ -39,9 +39,7 @@ cinitpp
 
 ### Dependencies
 
-- [nlohmann/json](https://github.com/nlohmann/json).
-  - Version 3.11.2-1
-  - Included in [include/external/](https://github.com/Renjian-buchai/cinitpp/blob/main/include/external)
+- None for now
 
 ### Building
 
