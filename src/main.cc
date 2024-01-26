@@ -26,6 +26,25 @@ uint8_t checkTrue(uint8_t flags, flag_t flag) {
   return flags & (1 << static_cast<uint8_t>(flag));
 }
 
+void recurse(const directory* currDir) {
+  static std::ofstream fstr;
+  // using filesystem_t = std::variant<directory, file>;
+  for (size_t i = 0; i < currDir->_inDir.size(); ++i) {
+    if (std::holds_alternative<directory>(currDir->_inDir[i])) {
+      std::filesystem::create_directories(
+          std::get_if<directory>(&(currDir->_inDir[i]))->_path);
+      recurse(std::get_if<directory>(&(currDir->_inDir[i])));
+    } else {
+      fstr.open(currDir->_path /
+                std::get_if<file>(&currDir->_inDir[i])->filePath);
+      fstr << std::get_if<file>(&currDir->_inDir[i])->_contents;
+      fstr.close();
+    }
+  }
+
+  return;
+}
+
 int main(int argc, const char** argv) {
   (void)argc, (void)argv;
 
@@ -58,20 +77,15 @@ int main(int argc, const char** argv) {
     // Check if dir is empty
   }
 
-  using filesystem_t = std::variant<directory, file>;
+  // using filesystem_t = std::variant<directory, file>;
 
   directory root{nullptr, "./"};
-  root._inDir = {file{"makefile"}};
+  root._inDir = {file{"makefile"}, directory{&root, "./aoeu"}};
+  std::get_if<directory>(&root._inDir[1])->_inDir = {
+      file{"Wtf", "aoeuaoeuaoeu"}};
   directory* currDir = &root;
 
-  uint8_t running = 1;
-
-  while (running) {
-    for (auto it = currDir->_inDir.begin(); it != currDir->_inDir.end(); ++it) {
-      if (std::holds_alternative<directory>(*it)) {
-            }
-    }
-  }
+  recurse(currDir);
 
   return 0;
 }

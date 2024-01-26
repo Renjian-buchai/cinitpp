@@ -19,7 +19,6 @@ class directory {
 
   std::vector<filesystem_t> _inDir;
 
- protected:
   directory* _prev;
   std::filesystem::path _path;
 };

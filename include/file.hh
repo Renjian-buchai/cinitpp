@@ -13,7 +13,6 @@ class file {
   const std::filesystem::path& path();
   const std::string& contents();
 
- protected:
   std::filesystem::path filePath;
   std::string _contents;
 };
