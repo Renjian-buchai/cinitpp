@@ -62,36 +62,40 @@ int main(int argc, const char** argv) {
       for (int i = 1; i < argc; ++i) {
         if (std::string(argv[i]) == "-I") {
           buffer = argv[++i];
-          flipTrue(flags, flag_t::input);
+          flags = flipTrue(flags, flag_t::input);
         }
 
         else if (std::string(argv[i]) == "-F") {
-          flipTrue(flags, flag_t::force);
+          flags = flipTrue(flags, flag_t::force);
         }
       }
   }
 
-  if (checkTrue(flags, flag_t::input)) {
-  }
-
-  if (!checkTrue(flags, flag_t::force)) {
-    if (!std::filesystem::is_empty(std::filesystem::current_path())) {
-      std::cerr << "Unable to initialise in a non-empty directory. To force "
-                   "the initialisation, use the flag `-f`.\n"
-                   "The .git/ folder is also not allowed.";
-      return 1;
+  // This one is in a scope because getting input is the hard part.
+  if (!checkTrue(flags, flag_t::input)) {
+    if (!checkTrue(flags, flag_t::force)) {
+      if (!std::filesystem::is_empty(std::filesystem::current_path())) {
+        std::cerr << "Unable to initialise in a non-empty directory.\n"
+                     "To force the initialisation, use the flag `-f`.\n"
+                     "This will delete the data contained in files that are "
+                     "created.\n\n"
+                     "The project must not have been initialised to an git "
+                     "repository already.\n";
+        return 1;
+      }
     }
+
+    // using filesystem_t = std::variant<directory, file>;
+    directory root{nullptr, "./"};
+    root._inDir = {file{"makefile"}, directory{&root, "./aoeu"}};
+    std::get_if<directory>(&root._inDir[1])->_inDir = {
+        file{"Wtf", "aoeuaoeuaoeu"}};
+    directory* currDir = &root;
+
+    recurse(currDir);
+
+    return 0;
   }
-
-  // using filesystem_t = std::variant<directory, file>;
-
-  directory root{nullptr, "./"};
-  root._inDir = {file{"makefile"}, directory{&root, "./aoeu"}};
-  std::get_if<directory>(&root._inDir[1])->_inDir = {
-      file{"Wtf", "aoeuaoeuaoeu"}};
-  directory* currDir = &root;
-
-  recurse(currDir);
 
   return 0;
 }
