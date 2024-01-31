@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include <queue>
 #include <string>
 #include <variant>
@@ -37,8 +38,7 @@ void recurse(const directory* currDir) {
           std::get_if<directory>(&(currDir->_inDir[i]))->_path);
       recurse(std::get_if<directory>(&(currDir->_inDir[i])));
     } else {
-      fstr.open(currDir->_path /
-                std::get_if<file>(&currDir->_inDir[i])->filePath);
+      fstr.open(std::get_if<file>(&currDir->_inDir[i])->filePath);
       fstr << std::get_if<file>(&currDir->_inDir[i])->_contents;
       fstr.close();
     }
@@ -87,15 +87,27 @@ int main(int argc, const char** argv) {
 
     // using filesystem_t = std::variant<directory, file>;
     directory root{nullptr, "./"};
-    root._inDir = {file{"makefile"}, directory{&root, "./aoeu"}};
+    root._inDir = {file{"./makefile"}, directory{&root, "./aoeu"}};
     std::get_if<directory>(&root._inDir[1])->_inDir = {
-        file{"Wtf", "aoeuaoeuaoeu"}};
+        file{"./aoeu/Wtf", "aoeuaoeuaoeu"}};
     directory* currDir = &root;
 
     recurse(currDir);
 
     return 0;
   }
+
+  // Validate input path
+  std::filesystem::path inputPath(buffer);
+  if (!std::filesystem::is_directory(inputPath)) {
+    std::cout << "Input path must be a directory.\n"
+                 "Please verify its existence.\n";
+    return 1;
+  }
+
+  for (const std::filesystem::directory_entry& entry :
+       std::filesystem::recursive_directory_iterator(inputPath)) {
+    }
 
   return 0;
 }
