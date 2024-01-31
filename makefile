@@ -24,7 +24,7 @@ com: $(src)
 
 dbgc: $(src) 
 	rm -f $(exe)
-	$(CC) $(CCFLAGS) -o$(exe) $(src) $(INC) $(LIN) $(DEF) $(STD) -g3 
+	$(CC) $(CCFLAGS) -o$(exe) $(src) $(INC) $(LIN) $(DEF) $(STD) -g3 -g 
 
 run: $(exe)
 	./$(exe)
