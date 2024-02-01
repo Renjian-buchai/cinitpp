@@ -6,7 +6,7 @@ LIN=
 DEF=
 STD=-std=c++17
 
-src=src/main.cc src/dir.cc src/file.cc
+src=src/main.cc src/file.cc
 exe=test.exe
 prexe=aoeu.exe
 

@@ -1,11 +1,11 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include <queue>
 #include <string>
 #include <variant>
 
-#include "../include/dir.hh"
 #include "../include/file.hh"
 
 enum class flag_t : uint8_t {
@@ -27,26 +27,6 @@ uint8_t checkTrue(uint8_t flags, flag_t flag) {
   return flags & (1 << static_cast<uint8_t>(flag));
 }
 
-// Don't touch
-void recurse(const directory* currDir) {
-  static std::ofstream fstr;
-  // using filesystem_t = std::variant<directory, file>;
-  for (size_t i = 0; i < currDir->_inDir.size(); ++i) {
-    if (std::holds_alternative<directory>(currDir->_inDir[i])) {
-      std::filesystem::create_directories(
-          std::get_if<directory>(&(currDir->_inDir[i]))->_path);
-      recurse(std::get_if<directory>(&(currDir->_inDir[i])));
-    } else {
-      fstr.open(currDir->_path /
-                std::get_if<file>(&currDir->_inDir[i])->filePath);
-      fstr << std::get_if<file>(&currDir->_inDir[i])->_contents;
-      fstr.close();
-    }
-  }
-
-  return;
-}
-
 int main(int argc, const char** argv) {
   (void)argc, (void)argv;
 
@@ -62,36 +42,61 @@ int main(int argc, const char** argv) {
       for (int i = 1; i < argc; ++i) {
         if (std::string(argv[i]) == "-I") {
           buffer = argv[++i];
-          flipTrue(flags, flag_t::input);
+          flags = flipTrue(flags, flag_t::input);
         }
 
         else if (std::string(argv[i]) == "-F") {
-          flipTrue(flags, flag_t::force);
+          flags = flipTrue(flags, flag_t::force);
         }
       }
   }
 
-  if (checkTrue(flags, flag_t::input)) {
-  }
+  // This one is in a scope because getting input is the hard part.
+  if (!checkTrue(flags, flag_t::input)) {
+    if (!checkTrue(flags, flag_t::force)) {
+      if (!std::filesystem::is_empty(std::filesystem::current_path())) {
+        std::cerr << "Unable to initialise in a non-empty directory.\n"
+                     "To force the initialisation, use the flag `-f`.\n"
+                     "This will delete the data contained in files that are "
+                     "created.\n\n"
+                     "The project must not have been initialised to an git "
+                     "repository already.\n";
+        return 1;
+      }
+    }
 
-  if (!checkTrue(flags, flag_t::force)) {
-    if (!std::filesystem::is_empty(std::filesystem::current_path())) {
-      std::cerr << "Unable to initialise in a non-empty directory. To force "
-                   "the initialisation, use the flag `-f`.\n"
-                   "The .git/ folder is also not allowed.";
+    std::vector<file> files;
+    files = {file{"./aoeu.txt", ""}, file{"./src/aoeu.txt", ""}};
+
+    std::ofstream _file;
+    for (auto file : files) {
+      std::filesystem::create_directories(file.filePath.parent_path());
+      _file.open(file.filePath);
+      _file << file._contents;
+      _file.close();
+    }
+    return 0;
+  }
+  // Validate input path
+  if (!buffer.empty()) {
+    std::filesystem::path inputPath(buffer);
+    if (!std::filesystem::is_directory(inputPath)) {
+      std::cout << "Input path must be a directory.\n"
+                   "Please verify its existence.\n";
       return 1;
     }
+
+    std::string _path;
+
+    for (const std::filesystem::directory_entry& entry :
+         std::filesystem::recursive_directory_iterator(inputPath)) {
+      if (!std::filesystem::is_directory(entry)) {
+        _path = std::filesystem::relative(entry.path()).string();
+        std::replace(_path.begin(), _path.end(), '\\', '/');
+        std::cout << _path << "\n";
+      }
+    }
   }
-
-  // using filesystem_t = std::variant<directory, file>;
-
-  directory root{nullptr, "./"};
-  root._inDir = {file{"makefile"}, directory{&root, "./aoeu"}};
-  std::get_if<directory>(&root._inDir[1])->_inDir = {
-      file{"Wtf", "aoeuaoeuaoeu"}};
-  directory* currDir = &root;
-
-  recurse(currDir);
 
   return 0;
 }
