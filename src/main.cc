@@ -97,6 +97,31 @@ int main(int argc, const char** argv) {
       }
     }
   }
+    }
+
+    // using filesystem_t = std::variant<directory, file>;
+    directory root{nullptr, "./"};
+    root._inDir = {file{"./makefile"}, directory{&root, "./aoeu"}};
+    std::get_if<directory>(&root._inDir[1])->_inDir = {
+        file{"./aoeu/Wtf", "aoeuaoeuaoeu"}};
+    directory* currDir = &root;
+
+    recurse(currDir);
+
+    return 0;
+  }
+
+  // Validate input path
+  std::filesystem::path inputPath(buffer);
+  if (!std::filesystem::is_directory(inputPath)) {
+    std::cout << "Input path must be a directory.\n"
+                 "Please verify its existence.\n";
+    return 1;
+  }
+
+  for (const std::filesystem::directory_entry& entry :
+       std::filesystem::recursive_directory_iterator(inputPath)) {
+    }
 
   return 0;
 }
