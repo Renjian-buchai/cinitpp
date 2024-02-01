@@ -6,7 +6,6 @@
 #include <string>
 #include <variant>
 
-#include "../include/dir.hh"
 #include "../include/file.hh"
 
 enum class flag_t : uint8_t {
@@ -26,25 +25,6 @@ uint8_t flipFalse(uint8_t& flags, flag_t flag) {
 
 uint8_t checkTrue(uint8_t flags, flag_t flag) {
   return flags & (1 << static_cast<uint8_t>(flag));
-}
-
-// Don't touch
-void recurse(const directory* currDir) {
-  static std::ofstream fstr;
-  // using filesystem_t = std::variant<directory, file>;
-  for (size_t i = 0; i < currDir->_inDir.size(); ++i) {
-    if (std::holds_alternative<directory>(currDir->_inDir[i])) {
-      std::filesystem::create_directories(
-          std::get_if<directory>(&(currDir->_inDir[i]))->_path);
-      recurse(std::get_if<directory>(&(currDir->_inDir[i])));
-    } else {
-      fstr.open(std::get_if<file>(&currDir->_inDir[i])->filePath);
-      fstr << std::get_if<file>(&currDir->_inDir[i])->_contents;
-      fstr.close();
-    }
-  }
-
-  return;
 }
 
 int main(int argc, const char** argv) {
@@ -83,6 +63,40 @@ int main(int argc, const char** argv) {
                      "repository already.\n";
         return 1;
       }
+    }
+
+    std::vector<file> files;
+    files = {file{"./aoeu.txt", ""}, file{"./src/aoeu.txt", ""}};
+
+    std::ofstream _file;
+    for (auto file : files) {
+      std::filesystem::create_directories(file.filePath.parent_path());
+      _file.open(file.filePath);
+      _file << file._contents;
+      _file.close();
+    }
+    return 0;
+  }
+  // Validate input path
+  if (!buffer.empty()) {
+    std::filesystem::path inputPath(buffer);
+    if (!std::filesystem::is_directory(inputPath)) {
+      std::cout << "Input path must be a directory.\n"
+                   "Please verify its existence.\n";
+      return 1;
+    }
+
+    std::string _path;
+
+    for (const std::filesystem::directory_entry& entry :
+         std::filesystem::recursive_directory_iterator(inputPath)) {
+      if (!std::filesystem::is_directory(entry)) {
+        _path = std::filesystem::relative(entry.path()).string();
+        std::replace(_path.begin(), _path.end(), '\\', '/');
+        std::cout << _path << "\n";
+      }
+    }
+  }
     }
 
     // using filesystem_t = std::variant<directory, file>;
