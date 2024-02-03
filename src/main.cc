@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -34,6 +35,23 @@ int main(int argc, const char** argv) {
 
   uint8_t flags = 0;
 
+  std::filesystem::path homeDir;
+
+#if defined(__unix__)
+  homeDir = std::getenv("HOME");
+  if (homeDir.empty()) {
+    std::cout << "Unable to find home directory to generate configuration. "
+                 "\nPlease make sure your HOME environment variable is "
+                 "properly configured. ";
+    return 2;
+  }
+#elif defined(_WIN32)
+  homeDir = std::getenv("USERPROFILE");
+  if (homeDir.empty()) {
+    homeDir = std::string(std::getenv("HOMEDRIVE")) + std::getenv("HOMEPATH");
+  }
+#endif
+
   switch (argc) {
     case 1:
       break;
@@ -64,9 +82,46 @@ int main(int argc, const char** argv) {
         return 1;
       }
     }
-
     std::vector<file> files;
-    files = {file{"./aoeu.txt", ""}, file{"./src/aoeu.txt", ""}};
+
+    if (!std::filesystem::exists(homeDir / ".cinitpp.json")) {
+      files = {
+          file{"./makefile", ""},
+          file{"./src/main.cc",
+               "int main(int argc, const char** argv, const char** envp) {\n"
+               "\t(void)argc, (void)argv, (void)envp;\n"
+               "\n"
+               "\treturn 0;"
+               "\n}"},
+          file{"./README.md", ""}};
+    } else {
+      std::ifstream input(homeDir / ".cinitpp.json");
+      nlohmann::json config;
+      try {
+        config = nlohmann::json::parse(input);
+      } catch (nlohmann::json::parse_error& e) {
+        std::cout << "Invalid JSON";
+        return 4;
+      }
+
+      if (!config.is_array()) {
+        std::cout << "JSON is in the wrong format.";
+        return 5;
+      }
+
+      files.push_back({std::filesystem::path("./") / config[1]["Path"],
+                       config[1]["Content"]});
+
+      try {
+        for (auto it : config) {
+          files.push_back(file{it["Path"].get<std::string>(),
+                               it["Content"].get<std::string>()});
+        }
+      } catch (nlohmann::json::exception& e) {
+        std::cout << "JSON is in the wrong format.";
+        return 5;
+      }
+    }
 
     std::ofstream _file;
     for (auto file : files) {
@@ -75,42 +130,51 @@ int main(int argc, const char** argv) {
       _file << file._contents;
       _file.close();
     }
+
     return 0;
   }
-  // Validate input path
-  if (!buffer.empty()) {
-    std::filesystem::path inputPath(buffer);
-    if (!std::filesystem::is_directory(inputPath)) {
-      std::cout << "Input path must be a directory.\n"
-                   "Please verify its existence.\n";
-      return 1;
-    }
 
-    std::string _path;
-    std::ifstream _fileIn;
-    std::string _buffer;
-    nlohmann::json config = nlohmann::json::array();
+  {
+    // Input
 
-    for (const std::filesystem::directory_entry& entry :
-         std::filesystem::recursive_directory_iterator(inputPath)) {
-      if (!std::filesystem::is_directory(entry)) {
-        _path = std::filesystem::relative(entry.path()).string();
-        std::replace(_path.begin(), _path.end(), '\\', '/');
-
-        _fileIn.open(_path);
-        _buffer = "";
-        while (std::getline(_fileIn, buffer)) {
-          _buffer += buffer + "\n";
-        }
-        _fileIn.close();
-
-        config.push_back(nlohmann::json::object({{_path, _buffer}}));
+    // Validate input path
+    if (!buffer.empty()) {
+      std::filesystem::path inputPath(buffer);
+      if (!std::filesystem::is_directory(inputPath)) {
+        std::cout << "Input path must be a directory.\n"
+                     "Please verify its existence.\n";
+        return 3;
       }
+
+      std::string _path;
+      std::ifstream _fileIn;
+      std::string _buffer;
+      nlohmann::json config = nlohmann::json::array();
+
+      for (const std::filesystem::directory_entry& entry :
+           std::filesystem::recursive_directory_iterator(inputPath)) {
+        if (!std::filesystem::is_directory(entry)) {
+          _path = std::filesystem::relative(entry.path()).string();
+          std::replace(_path.begin(), _path.end(), '\\', '/');
+
+          _fileIn.open(_path);
+          _buffer = "";
+          while (std::getline(_fileIn, buffer)) {
+            _buffer += buffer + "\n";
+          }
+          _fileIn.close();
+
+          config.push_back(nlohmann::json::object(
+              {{"Path", static_cast<std::filesystem::path>(".") / _path},
+               {"Content", _buffer}}));
+        }
+      }
+
+      std::ofstream output(homeDir / ".cinitpp.json");
+      output << std::setw(4) << config;
+      output.close();
     }
 
-    std::ofstream output("./.cinitpp.json");
-    output << std::setw(4) << config;
+    return 0;
   }
-
-  return 0;
 }
