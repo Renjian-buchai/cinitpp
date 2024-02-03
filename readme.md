@@ -4,7 +4,7 @@ Initialise your C++ projects easily with cinitpp!
 
 ## Table of contents
 
-- [Cinitpp](#cinitpp)
+- [cinitpp](#cinitpp)
   - [Table of contents](#table-of-contents)
   - [License](#license)
   - [Documentation](#documentation)
@@ -22,13 +22,41 @@ This project is licensed under the Apache license. View [LICENSE](https://github
 
 ## Documentation
 
-None for now.
+JSON config format: 
+
+```json
+[
+  {
+    "Path": "./path/to/file.txt", 
+    "Contents": "contents"
+  }, 
+  // ...
+]
+```
 
 ## Usage
+
+To initialise, use the following command: 
 
 ```c++
 cinitpp
 ```
+
+To force an initialisation even when the current directory is not empty, use the following command: 
+
+```c++
+cinitpp -F
+```
+
+To generate a config file, use the following command: 
+
+```c++
+cinitpp -I <INPUT DIRECTORY>
+```
+
+Note, the directory MUST follow IMMEDIATELY AFTER the flag -I. 
+
+Usage of -I and -F will ignore -F. 
 
 ## Future plans
 
@@ -47,5 +75,5 @@ You can use the makefile as reference. TLDR:
 
 - Standard = C++17
 - Source = src/main.cc main.exe
-- Additional include paths = include/external
+- Additional include paths = 
 - If possible, -Wall -Wextra -Werror (Though I wouldn't mind if there were warnings, I'd still attempt to correct them, so to save time, it'd be best to use all warnings)
