@@ -39,7 +39,7 @@ cinitpp
 
 ### Dependencies
 
-- None for now
+- Nlohmann-json 
 
 ### Building
 
