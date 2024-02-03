@@ -88,10 +88,8 @@ int main(int argc, const char** argv) {
 
     std::string _path;
     std::ifstream _fileIn;
-    std::string __buffer;
     std::string _buffer;
-
-    __buffer = "[";
+    nlohmann::json config = nlohmann::json::array();
 
     for (const std::filesystem::directory_entry& entry :
          std::filesystem::recursive_directory_iterator(inputPath)) {
@@ -102,23 +100,16 @@ int main(int argc, const char** argv) {
         _fileIn.open(_path);
         _buffer = "";
         while (std::getline(_fileIn, buffer)) {
-          _buffer += buffer + "\\n";
+          _buffer += buffer + "\n";
         }
         _fileIn.close();
 
-        __buffer +=
-            "{\"Path\":\"" + _path + "\", \"contents\":\"" + _buffer + "\"},";
+        config.push_back(nlohmann::json::object({{_path, _buffer}}));
       }
     }
-    __buffer.pop_back();
-    __buffer += "]";
 
-    nlohmann::json _new = nlohmann::json::parse(__buffer);
-
-    std::ofstream config;
-    config.open("./.cinitpp.json");
-    config << std::setw(4) << _new;
-    config.close();
+    std::ofstream output("./.cinitpp.json");
+    output << std::setw(4) << config;
   }
 
   return 0;
