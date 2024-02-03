@@ -32,7 +32,7 @@ int main(int argc, const char** argv) {
 
   std::string buffer;
 
-  uint8_t flags;
+  uint8_t flags = 0;
 
   switch (argc) {
     case 1:
@@ -87,15 +87,38 @@ int main(int argc, const char** argv) {
     }
 
     std::string _path;
+    std::ifstream _fileIn;
+    std::string __buffer;
+    std::string _buffer;
+
+    __buffer = "[";
 
     for (const std::filesystem::directory_entry& entry :
          std::filesystem::recursive_directory_iterator(inputPath)) {
       if (!std::filesystem::is_directory(entry)) {
         _path = std::filesystem::relative(entry.path()).string();
         std::replace(_path.begin(), _path.end(), '\\', '/');
-        std::cout << _path << "\n";
+
+        _fileIn.open(_path);
+        _buffer = "";
+        while (std::getline(_fileIn, buffer)) {
+          _buffer += buffer + "\\n";
+        }
+        _fileIn.close();
+
+        __buffer +=
+            "{\"Path\":\"" + _path + "\", \"contents\":\"" + _buffer + "\"},";
       }
     }
+    __buffer.pop_back();
+    __buffer += "]";
+
+    nlohmann::json _new = nlohmann::json::parse(__buffer);
+
+    std::ofstream config;
+    config.open("./.cinitpp.json");
+    config << std::setw(4) << _new;
+    config.close();
   }
 
   return 0;
