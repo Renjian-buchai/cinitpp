@@ -4,7 +4,7 @@ Initialise your C++ projects easily with cinitpp!
 
 ## Table of contents
 
-- [Cinitpp](#cinitpp)
+- [cinitpp](#cinitpp)
   - [Table of contents](#table-of-contents)
   - [License](#license)
   - [Documentation](#documentation)
@@ -22,7 +22,17 @@ This project is licensed under the Apache license. View [LICENSE](https://github
 
 ## Documentation
 
-None for now.
+JSON config format: 
+
+```json
+[
+  {
+    "Path": "./path/to/file.txt", 
+    "Contents": "contents"
+  }, 
+  // ...
+]
+```
 
 ## Usage
 
