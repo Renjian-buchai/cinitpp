@@ -9,10 +9,10 @@ Initialise your C++ projects easily with cinitpp!
   - [License](#license)
   - [Documentation](#documentation)
   - [Usage](#usage)
+  - [Limitations](#limitations)
   - [Future plans](#future-plans)
   - [Build instructions](#build-instructions)
     - [Dependencies](#dependencies)
-    - [Building](#building)
 
 ## License
 
@@ -22,41 +22,53 @@ This project is licensed under the Apache license. View [LICENSE](https://github
 
 ## Documentation
 
-JSON config format: 
+JSON config format:
 
 ```json
 [
   {
-    "Path": "./path/to/file.txt", 
-    "Contents": "contents"
-  }, 
-  // ...
+    "config": "configName",
+    "items": [
+      {"name": "path/to/file.txt", "contents": "contents"},
+
+      // Directories will terminate with a '/'; content will be ignored.
+      {"name": "path/to/dir/", "contents": ""} 
+      
+      // Other files and dirs 
+    ]
+  }
+
+  // Other configs 
 ]
 ```
 
 ## Usage
 
-To initialise, use the following command: 
+To initialise, use the following command:
 
-```c++
+```pwsh
 cinitpp
 ```
 
-To force an initialisation even when the current directory is not empty, use the following command: 
+To force an initialisation even when the current directory is not empty, use the following command:
 
-```c++
+```pwsh
 cinitpp -F
 ```
 
-To generate a config file, use the following command: 
+To generate a config file, use the following command:
 
-```c++
+```pwsh
 cinitpp -I <INPUT DIRECTORY>
 ```
 
-Note, the directory MUST follow IMMEDIATELY AFTER the flag -I. 
+Note, the directory MUST follow IMMEDIATELY AFTER the flag -I.
 
-Usage of -I and -F will ignore -F. 
+Usage of -I and -F will ignore -F.
+
+## Limitations
+
+Due to my inability to give a shit and std::filesystem's default separators, Windows configurations will not be compatible with linux.
 
 ## Future plans
 
@@ -67,13 +79,4 @@ Usage of -I and -F will ignore -F.
 
 ### Dependencies
 
-- Nlohmann-json 
-
-### Building
-
-You can use the makefile as reference. TLDR:
-
-- Standard = C++17
-- Source = src/main.cc main.exe
-- Additional include paths = 
-- If possible, -Wall -Wextra -Werror (Though I wouldn't mind if there were warnings, I'd still attempt to correct them, so to save time, it'd be best to use all warnings)
+- rapidjson 1.1.0
