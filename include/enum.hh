@@ -16,6 +16,7 @@ enum err_t : uint64_t {
   errSuccess = 0,
   invalidFlags,
   invalidPath,
+  nonEmptyDir,
 };
 
 #endif

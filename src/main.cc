@@ -11,12 +11,13 @@ int main(int argc [[maybe_unused]], char** argv [[maybe_unused]]) {
   namespace stdfs = std::filesystem;
   std::vector<bool> flags(flag_t::flagSize);
 
-  stdfs::path initPath = "";
+  stdfs::path inPath = "";
 
   std::string err = "";
 
   for (int i = 1; i < argc; ++i) {
     if (argv[i][0] != '-') {
+      inPath = argv[i];
       continue;
     }
 
@@ -33,7 +34,7 @@ int main(int argc [[maybe_unused]], char** argv [[maybe_unused]]) {
         flags[flag_t::input] = true;
 
         if (++i < argc) {
-          initPath = stdfs::path(argv[i]);
+          inPath = stdfs::path(argv[i]);
         } else {
           std::cout << "No path provided.\n"
                     << "Using path '" + stdfs::current_path().string() + "'.\n";
@@ -44,6 +45,10 @@ int main(int argc [[maybe_unused]], char** argv [[maybe_unused]]) {
         err += "Invalid argument: '" + std::string(argv[i]) + "'; Ignoring.\n";
         break;
     }
+  }
+
+  if (inPath == "") {
+    inPath = stdfs::current_path();
   }
 
   if (!flags[flag_t::force] && err != "") {
@@ -57,10 +62,10 @@ int main(int argc [[maybe_unused]], char** argv [[maybe_unused]]) {
 
   if (flags[flag_t::input]) {
   } else {
-    ret = initialise(flags, initPath, err);
+    ret = initialise(flags, inPath, err);
   }
 
-  if (!flags[flag_t::force]) {
+  if (!flags[flag_t::force] && err != "") {
     std::cerr << err << "\n";
   }
 
