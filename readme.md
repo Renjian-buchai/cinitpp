@@ -29,10 +29,10 @@ JSON config format:
   {
     "config": "configName",
     "items": [
-      {"name": "path/to/file.txt", "contents": "contents"},
+      {"path": "path/to/file.txt", "contents": "contents"},
 
       // Directories will terminate with a '/'; content will be ignored.
-      {"name": "path/to/dir/", "contents": ""} 
+      {"path": "path/to/dir/", "contents": ""} 
       
       // Other files and dirs 
     ]

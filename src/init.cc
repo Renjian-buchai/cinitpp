@@ -11,7 +11,9 @@ err_t initialise(const std::vector<bool>& flags,
   namespace stdfs = std::filesystem;
 
   if (!stdfs::is_directory(initPath) || !stdfs::exists(initPath)) {
-    err += "'" + initPath.string() + "' is not a directory. Exiting...\n";
+    err += "'" + initPath.string() +
+           "' is not a directory.\n"
+           "Exiting...\n";
     return err_t::invalidPath;
   }
 

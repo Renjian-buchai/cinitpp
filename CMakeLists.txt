@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.30.0)
 
-set(CMAKE_CXX_STANDARD_REQUIRED 17)
 
 project(cinitpp)
 set(VERSION 2.0.0)
@@ -23,7 +22,12 @@ else()
                 ${CMAKE_CURRENT_BINARY_DIR}/.cinitpp.json)
 endif()
 
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED 17)
+
 target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/include")
 target_include_directories(${PROJECT_NAME} PRIVATE "${INCLUDE_DIR}")
+
+target_include_directories(${PROJECT_NAME} PRIVATE "U:/msys64/ucrt64/include")
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE <array> <cstdint> <iostream> <memory> <string> <utility> <variant> <vector> <nlohmann/json.hpp>)

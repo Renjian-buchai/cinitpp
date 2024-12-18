@@ -24,8 +24,15 @@ enum err_t : uint64_t {
 
   whereTfIsHome,
   missingContents,
+  malformedJSON,
 };
 
 using dirItems = std::vector<std::pair<std::filesystem::path, std::string>>;
+#define dirItemsDefault                                                       \
+  {                                                                           \
+    {"src/main.cpp", "int main() {}"}, {"include/", ""}, {"README.md", ""}, { \
+      "CMakeLists.txt", ""                                                    \
+    }                                                                         \
+  }
 
 #endif

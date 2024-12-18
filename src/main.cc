@@ -42,7 +42,9 @@ int main(int argc [[maybe_unused]], char** argv [[maybe_unused]]) {
         break;
 
       default:
-        err += "Invalid argument: '" + std::string(argv[i]) + "'; Ignoring.\n";
+        err += "Invalid argument: '" + std::string(argv[i]) +
+               "';\n"
+               "Ignoring.\n";
         break;
     }
   }

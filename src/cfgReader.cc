@@ -1,5 +1,7 @@
 #include "cfgReader.hh"
 
+#include <stdlib.h>
+
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
@@ -9,7 +11,7 @@
 
 err_t readConfig(dirItems& output, std::string& err) {
   namespace stdfs = std::filesystem;
-  namespace json = nlohmann;
+  using json = nlohmann::json;
 
   stdfs::path configPath;
 
@@ -36,10 +38,9 @@ err_t readConfig(dirItems& output, std::string& err) {
     }
 
     if (configPath.empty()) {
-      err +=
-          "Unable to find home directory.\n"
-          "We don't know what's happening here, too.\n"
-          "Exiting...";
+      std::cerr << "Unable to find home directory.\n"
+                   "We don't know what's happening here, too.\n"
+                   "Exiting...\n\n";
       return err_t::whereTfIsHome;
     }
 #endif
@@ -47,13 +48,73 @@ err_t readConfig(dirItems& output, std::string& err) {
     configPath /= ".cinitpp.json";
   }
 
-  std::string data;
+  if (!stdfs::exists(configPath)) {
+    err +=
+        "Unable to find '.cinitpp.json' configuration file.\n"
+        "Proceeding with cinitpp's default config.\n";
+
+    output = dirItemsDefault;
+    return err_t::errSuccess;
+  }
+
+  json::value_type config;
+
   {
+    nlohmann::json configs;
     std::ifstream input(configPath, std::ios::in);
-    std::string buffer;
-    while (std::getline(input, buffer)) {
-      data += buffer + "\n";
+    configs = nlohmann::json::parse(input);
+
+    for (const json::value_type& it : configs) {
+      if (!it.is_object()) {
+        std::cerr << "Malformed json.\n"
+                     "Exiting...\n\n";
+        return err_t::malformedJSON;
+      }
+
+      if (it.contains("config") && it["config"].is_string() &&
+          it["config"].template get<std::string>() == "Default") {
+        config = it;
+      }
     }
+
+    if (config.empty()) {
+      err +=
+          "Unable to find 'Default' config.\n"
+          "Proceeding with cinitpp's default config.\n";
+
+      output = dirItemsDefault;
+      return err_t::errSuccess;
+    }
+
+    if (!config.contains("items")) {
+      std::cerr << "Malformed json.\n"
+                   "Unable to find 'contents' in config: "
+                << config["config"]
+                << "\n"
+                   "Exiting...\n\n";
+      return err_t::malformedJSON;
+    }
+
+    config = config["items"];
+  }
+
+  for (const auto& item : config) {
+    if (!item.contains("path")) {
+      std::cerr << "Unable to find 'path' in items.\n"
+                   "Exiting...\n\n";
+      return err_t::malformedJSON;
+    }
+
+    if (!item.contains("contents")) {
+      std::cerr << "Unable to find 'contents' in directory item: "
+                << item["path"]
+                << "\n"
+                   "Exiting...\n\n";
+      return err_t::malformedJSON;
+    }
+
+    output.emplace_back(item["path"].template get<std::string>(),
+                        item["contents"].template get<std::string>());
   }
 
   return err_t::errSuccess;

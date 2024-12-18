@@ -3,17 +3,20 @@
     "config":"Default",
     "items":[
       {
-        "name":"aoeu.txt",
+        "path":"aoeu.txt",
         "contents":"contents\n"
       },
       {
-        "name":"boeu/",
+        "path":"boeu/",
         "contents":""
       },
       {
-        "name":"coeu/aoeu.txt",
+        "path":"coeu/aoeu.txt",
         "contents":"aoeu"
       }
     ]
+  }, {
+    "config":"Rubbish", 
+    "items": []
   }
 ] 
