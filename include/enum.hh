@@ -2,6 +2,10 @@
 #define CINITPP_ENUM_HH
 
 #include <cstdint>
+#include <filesystem>
+#include <string>
+#include <utility>
+#include <vector>
 
 enum flag_t : uint64_t {
   // Force creation, even if files are overwritten
@@ -17,6 +21,11 @@ enum err_t : uint64_t {
   invalidFlags,
   invalidPath,
   nonEmptyDir,
+
+  whereTfIsHome,
+  missingContents,
 };
+
+using dirItems = std::vector<std::pair<std::filesystem::path, std::string>>;
 
 #endif

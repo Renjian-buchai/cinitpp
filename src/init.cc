@@ -3,10 +3,8 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <utility>
-#include <vector>
 
-using dirItems = std::vector<std::pair<std::filesystem::path, std::string>>;
+#include "cfgReader.hh"
 
 err_t initialise(const std::vector<bool>& flags,
                  const std::filesystem::path& initPath, std::string& err) {
@@ -24,8 +22,8 @@ err_t initialise(const std::vector<bool>& flags,
     return err_t::nonEmptyDir;
   }
 
-  dirItems toCreate{
-      {"aoeu.txt", "aoeu\nboeu\n"}, {"boeu/", ""}, {"coeu/aoeu.txt", ""}};
+  dirItems toCreate{};
+  readConfig(toCreate, err);
 
   for (const auto& [path, content] : toCreate) {
     char terminating = path.string().back();
