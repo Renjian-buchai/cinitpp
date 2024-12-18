@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED 17)
 project(cinitpp)
 set(VERSION 2.0.0)
 
-find_package(rapidjson 1.1.0 REQUIRED)
+find_package(nlohmann_json 3.11.0 REQUIRED)
 
 file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.cc)
 
@@ -26,4 +26,4 @@ endif()
 target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/include")
 target_include_directories(${PROJECT_NAME} PRIVATE "${INCLUDE_DIR}")
 
-target_precompile_headers(${PROJECT_NAME} PRIVATE <array> <cstdint> <iostream> <memory> <string> <utility> <variant> <vector> "include/rapidjson.hh")
+target_precompile_headers(${PROJECT_NAME} PRIVATE <array> <cstdint> <iostream> <memory> <string> <utility> <variant> <vector> <nlohmann/json.hpp>)

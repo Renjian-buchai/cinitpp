@@ -4,13 +4,12 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include <string>
-
-#include "rapidjson.hh"
 
 err_t readConfig(dirItems& output, std::string& err) {
   namespace stdfs = std::filesystem;
-  namespace json = rapidjson;
+  namespace json = nlohmann;
 
   stdfs::path configPath;
 
@@ -55,43 +54,6 @@ err_t readConfig(dirItems& output, std::string& err) {
     while (std::getline(input, buffer)) {
       data += buffer + "\n";
     }
-  }
-
-  json::Value contents(json::kArrayType);
-
-  {
-    json::Value::Array configs =
-        json::Document().Parse(data.c_str()).GetArray();
-
-    for (auto it = configs.Begin(); it != configs.End(); ++it) {
-      std::cout << it->GetType();
-      if (!it->HasMember("config")) {
-        err +=
-            "Unable to get config name of an object.\n"
-            "Ignoring...\n";
-        // continue;
-      }
-
-      if ((*it)["config"] == "Default") {
-        if (!it->HasMember("contents")) {
-          err +=
-              "Unable to get contents of folder to be initialised.\n"
-              "Exiting...";
-          return err_t::missingContents;
-        }
-
-        contents = (*it)["contents"].GetArray();
-        break;
-      }
-    }
-  }
-
-  output.clear();
-
-  std::cout << err;
-
-  for (auto& item : contents.GetArray()) {
-    output.emplace_back(item["name"].GetString(), item["contents"].GetString());
   }
 
   return err_t::errSuccess;

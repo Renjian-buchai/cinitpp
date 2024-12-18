@@ -79,4 +79,4 @@ Due to my inability to give a shit and std::filesystem's default separators, Win
 
 ### Dependencies
 
-- rapidjson 1.1.0
+- nlohmann/json 3.11.0

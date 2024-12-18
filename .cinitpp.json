@@ -1,1 +1,19 @@
-[{"config":"Default","items":[{"name":"aoeu.txt","contents":"contents\n"},{"name":"boeu/","contents":""},{"name":"coeu/aoeu.txt","contents":"aoeu"}]}] 
+[
+  {
+    "config":"Default",
+    "items":[
+      {
+        "name":"aoeu.txt",
+        "contents":"contents\n"
+      },
+      {
+        "name":"boeu/",
+        "contents":""
+      },
+      {
+        "name":"coeu/aoeu.txt",
+        "contents":"aoeu"
+      }
+    ]
+  }
+] 
