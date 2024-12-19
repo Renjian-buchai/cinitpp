@@ -9,7 +9,7 @@
 
 #include "inputData.hh"
 
-int main(int argc [[maybe_unused]], char **argv [[maybe_unused]]) {
+int main(int argc, char **argv) {
   namespace stdfs = std::filesystem;
   std::vector<bool> flags(flag_t::flagSize);
 
@@ -19,6 +19,10 @@ int main(int argc [[maybe_unused]], char **argv [[maybe_unused]]) {
 
   for (int i = 1; i < argc; ++i) {
     if (argv[i][0] != '-') {
+      if (inputData.inputPath != "") {
+        err += "Candidate input path `" + inputData.inputPath.string() +
+               "` succeeded by input path `" + argv[i] + "`.\n";
+      }
       inputData.inputPath = argv[i];
       continue;
     }
@@ -88,7 +92,7 @@ int main(int argc [[maybe_unused]], char **argv [[maybe_unused]]) {
     inputData.inputPath = stdfs::current_path();
   }
 
-  if (!flags[flag_t::force] && err != "") {
+  if (inputData.inputPath == "") {
     std::cerr << err + "\n"
               << "If your path starts with '-', please make sure it succeeds "
                  "your invokation of -I.\n";
@@ -106,6 +110,9 @@ int main(int argc [[maybe_unused]], char **argv [[maybe_unused]]) {
   }
 
   if (!flags[flag_t::force] && err != "") {
+    if (ret) {
+      std::cerr << "Diagnostic: \n";
+    }
     std::cerr << err;
   }
 
