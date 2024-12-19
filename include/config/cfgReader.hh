@@ -4,6 +4,7 @@
 
 #include "enum.hh"
 
-err_t readConfig(dirItems &output, std::string &err);
+err_t readConfig(const std::filesystem::path &exePath, dirItems &output,
+                 std::string &err);
 
 #endif

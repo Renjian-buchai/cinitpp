@@ -67,7 +67,7 @@ int main(int argc [[maybe_unused]], char **argv [[maybe_unused]]) {
 
       err += "Invalid argument: `" + option +
              "`;\n"
-             "Ignoring.\n";
+             "Ignoring...\n";
       break;
     }
   }
@@ -85,12 +85,12 @@ int main(int argc [[maybe_unused]], char **argv [[maybe_unused]]) {
 
   err_t ret = err_t::errSuccess;
 
+  const auto exePath = stdfs::path(argv[0]).parent_path();
+
   if (flags[flag_t::input]) {
-    ret = autoConf(flags, inPath, err,
-                   flags[flag_t::global] ? stdfs::path(argv[0]).parent_path()
-                                         : "");
+    ret = autoConf(flags, inPath, err, flags[flag_t::global] ? exePath : "");
   } else {
-    ret = initialise(stdfs::path(argv[0]).parent_path(), flags, inPath, err);
+    ret = initialise(exePath, flags, inPath, err);
   }
 
   if (!flags[flag_t::force] && err != "") {

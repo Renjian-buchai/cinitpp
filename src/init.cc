@@ -6,15 +6,15 @@
 
 #include "config/cfgReader.hh"
 
-err_t initialise(const std::filesystem::path &&exePath,
+err_t initialise(const std::filesystem::path &exePath,
                  const std::vector<bool> &flags,
                  const std::filesystem::path &initPath, std::string &err) {
   namespace stdfs = std::filesystem;
 
   if (!stdfs::is_directory(initPath) || !stdfs::exists(initPath)) {
-    err += "`" + initPath.string() +
-           "` is not a directory.\n"
-           "Exiting...\n";
+    std::cerr << "`" + initPath.string() +
+                     "` is not a directory.\n"
+                     "Exiting...\n\n";
     return err_t::invalidPath;
   }
 
@@ -26,7 +26,10 @@ err_t initialise(const std::filesystem::path &&exePath,
   }
 
   dirItems toCreate{};
-  readConfig(toCreate, err);
+  if (const err_t error =
+          readConfig(flags[flag_t::global] ? exePath : "", toCreate, err)) {
+    return error;
+  }
 
   for (const auto &[path, content] : toCreate) {
     std::string pathstr = path.string();

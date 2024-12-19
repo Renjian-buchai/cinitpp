@@ -12,9 +12,7 @@ Initialise your C++ projects easily with cinitpp!
     - [Initialisation](#initialisation)
     - [Configuration](#configuration)
   - [Limitations](#limitations)
-  - [Future plans](#future-plans)
-  - [Build instructions](#build-instructions)
-    - [Dependencies](#dependencies)
+  - [Dependencies](#dependencies)
 
 ## License
 
@@ -95,19 +93,12 @@ To create a config file that's effective globally, include the flag `-G`.
 cinitpp -G -I <INPUT DIRECTORY> 
 ```
 
-Using config file `-F` will suppress all messages (e.g., `Wrote configuration to...`)
+Using config file `-F` will suppress all non-error messages (e.g., `Wrote configuration to ~/.cinitpp.json`)
 
 ## Limitations
 
-Due to my inability to give a shit and std::filesystem's default separators, Windows configurations will not be compatible with linux.
+Due to my inability to give a shit and std::filesystem's substandard design choices, Windows configurations will not be compatible with linux.
 
-## Future plans
-
-- Making it configurable
-- Making it save the configuration
-
-## Build instructions
-
-### Dependencies
+## Dependencies
 
 - nlohmann/json 3.11.0
