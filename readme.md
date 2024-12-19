@@ -55,7 +55,13 @@ cinitpp
 
 To force an initialisation even when the current directory is not empty, use the flag `-f, --force`
 
-Note, the input directory must follow immediately after the flag `-I, --input`.
+Using the flag `-c, --config` will read the specific configuration within the config file.
+
+```pwsh
+cinitpp -c <CONFIG IDENTIFIER>
+```
+
+Note, the config name must follow immediately after the flag. When not specified, the configuration `Default` will be read from.
 
 Using the flag `-g, --global` will read the configuration that's effective globally.
 
@@ -80,21 +86,31 @@ By default, cinitpp will search for the local config, (i.e., the configuration l
 
 ### Configuration
 
-To generate a config file, use the flag `-I`
+To generate a config file, use the flag `-I, --input`
 
 ```pwsh
 cinitpp -I <INPUT DIRECTORY>
 ```
 
+Note, the input directory must follow immediately after the flag `-I, --input`.
+
 The config file will be created at your home directory by default.
 
-To create a config file that's effective globally, include the flag `-g`.
+To create a config file that's effective globally, include the flag `-g, --global`.
 
 ```pwsh
 cinitpp -G -I <INPUT DIRECTORY> 
 ```
 
-Using config file `-f` will suppress all non-error messages (e.g., `Wrote configuration to ~/.cinitpp.json`)
+To add a configuration with a unique identifier to the config file, use the flag `-c, --config`. If it already exists, the previous configuration associated with that identifier will be overwritten.
+
+```pwsh
+cinitpp -I <INPUT DIRECTORY> -c <CONFIG IDENTIFIER>
+```
+
+If a configuration identifier is not provided, the configuration `Default` will be created or overwritten.
+
+Using config file `-f, --force` will suppress all non-error messages (e.g., `Wrote configuration to ~/.cinitpp.json`)
 
 ## Limitations
 
