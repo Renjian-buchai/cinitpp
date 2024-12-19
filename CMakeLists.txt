@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.30.0)
 
 
 project(cinitpp)
-set(VERSION 2.0.0)
+set(VERSION 2.1.0)
 
 find_package(nlohmann_json 3.11.0 REQUIRED)
 
