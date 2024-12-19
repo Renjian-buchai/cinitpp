@@ -9,6 +9,8 @@ Initialise your C++ projects easily with cinitpp!
   - [License](#license)
   - [Documentation](#documentation)
   - [Usage](#usage)
+    - [Initialisation](#initialisation)
+    - [Configuration](#configuration)
   - [Limitations](#limitations)
   - [Future plans](#future-plans)
   - [Build instructions](#build-instructions)
@@ -16,7 +18,7 @@ Initialise your C++ projects easily with cinitpp!
 
 ## License
 
-Copyright © 2023 Contributors
+Copyright © 2023-2024 Contributors
 
 This project is licensed under the Apache license. View [LICENSE](https://github.com/Renjian-buchai/cinitpp/blob/main/LICENSE) for more details.
 
@@ -44,27 +46,56 @@ JSON config format:
 
 ## Usage
 
+### Initialisation
+
 To initialise, use the following command:
 
 ```pwsh
 cinitpp
 ```
 
-To force an initialisation even when the current directory is not empty, use the following command:
+To force an initialisation even when the current directory is not empty, use the flag `-F, -f, --force`
+
+Note, the input directory must follow immediately after the flag `-I, -i, --input`.
+
+Using the flag `-G, -g, --global` will read the configuration that's effective globally.
 
 ```pwsh
-cinitpp -F
+cinitpp -G
 ```
 
-To generate a config file, use the following command:
+By default, cinitpp will search for the local config, (i.e., the configuration located in the home directory) followed by the global config. If none of those are available, it will use the default initialisation data:
+
+```pwsh
+./
+├───include/
+├───src/
+│   └───main.cpp 
+│       "int main() {}"
+│
+├───README.md
+│   ""
+└───CMakeLists.txt
+    ""
+```
+
+### Configuration
+
+To generate a config file, use the flag `-I`
 
 ```pwsh
 cinitpp -I <INPUT DIRECTORY>
 ```
 
-Note, the directory MUST follow IMMEDIATELY AFTER the flag -I.
+The config file will be created at your home directory by default.
 
-Usage of -I and -F will ignore -F.
+To create a config file that's effective globally, include the flag `-G`.
+
+```pwsh
+cinitpp -G -I <INPUT DIRECTORY> 
+```
+
+Using config file `-F` will suppress all messages (e.g., `Wrote configuration to...`)
 
 ## Limitations
 
