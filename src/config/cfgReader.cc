@@ -22,8 +22,8 @@ err_t readConfig(dirItems &output, std::string &err) {
   }
 
   if (stdfs::exists(configPath / ".cinitpp.json")) {
-    err += "Using user config at '" + (configPath / ".cinitpp.json").string() +
-           "'\n";
+    err += "Using user config at `" + (configPath / ".cinitpp.json").string() +
+           "`\n";
     configPath /= ".cinitpp.json";
   } else {
     configPath = stdfs::current_path() / ".cinitpp.json";
@@ -34,7 +34,7 @@ err_t readConfig(dirItems &output, std::string &err) {
       output = dirItemsDefault;
       return err_t::errSuccess;
     } else {
-      err += "Using global config at '" + (configPath).string() + "'\n";
+      err += "Using global config at `" + configPath.string() + "`\n";
     }
   }
 

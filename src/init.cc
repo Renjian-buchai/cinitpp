@@ -12,15 +12,15 @@ err_t initialise(const std::filesystem::path &&exePath,
   namespace stdfs = std::filesystem;
 
   if (!stdfs::is_directory(initPath) || !stdfs::exists(initPath)) {
-    err += "'" + initPath.string() +
-           "' is not a directory.\n"
+    err += "`" + initPath.string() +
+           "` is not a directory.\n"
            "Exiting...\n";
     return err_t::invalidPath;
   }
 
   if (!flags[flag_t::force] && !stdfs::is_empty(initPath)) {
-    err += "'" + initPath.string() +
-           "' is not empty.\n"
+    err += "`" + initPath.string() +
+           "` is not empty.\n"
            "Use `-f` to ignore this warning and proceed anyways.\n";
     return err_t::nonEmptyDir;
   }

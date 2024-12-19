@@ -25,25 +25,48 @@ int main(int argc [[maybe_unused]], char **argv [[maybe_unused]]) {
     case 'F':
       [[fallthrough]];
     case 'f':
+    forceFlag:
       flags[flag_t::force] = true;
       break;
 
     case 'I':
       [[fallthrough]];
     case 'i':
+    inputFlag:
       flags[flag_t::input] = true;
 
       if (++i < argc) {
         inPath = stdfs::path(argv[i]);
       } else {
         std::cout << "No path provided.\n"
-                  << "Using path '" + stdfs::current_path().string() + "'.\n";
+                  << "Using path `" + stdfs::current_path().string() + "`.\n";
       }
       break;
 
+    case 'G':
+      [[fallthrough]];
+    case 'g':
+    globalFlag:
+      flags[flag_t::global] = true;
+      break;
+
     default:
-      err += "Invalid argument: '" + std::string(argv[i]) +
-             "';\n"
+      std::string option = std::string(argv[i]);
+
+      if (option == "--force") {
+        goto forceFlag;
+      }
+
+      if (option == "--input") {
+        goto inputFlag;
+      }
+
+      if (option == "--global") {
+        goto globalFlag;
+      }
+
+      err += "Invalid argument: `" + option +
+             "`;\n"
              "Ignoring.\n";
       break;
     }
@@ -63,7 +86,9 @@ int main(int argc [[maybe_unused]], char **argv [[maybe_unused]]) {
   err_t ret = err_t::errSuccess;
 
   if (flags[flag_t::input]) {
-    ret = autoConf(flags, inPath, err, stdfs::path(argv[0]).parent_path());
+    ret = autoConf(flags, inPath, err,
+                   flags[flag_t::global] ? stdfs::path(argv[0]).parent_path()
+                                         : "");
   } else {
     ret = initialise(stdfs::path(argv[0]).parent_path(), flags, inPath, err);
   }

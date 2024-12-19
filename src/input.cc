@@ -10,15 +10,15 @@ err_t autoConf(const std::vector<bool> &flags,
   namespace stdfs = std::filesystem;
 
   if (!stdfs::exists(readPath)) {
-    std::cerr << "Path '" << readPath.string()
-              << "' does not exist\n"
+    std::cerr << "Path `" << readPath.string()
+              << "` does not exist\n"
                  "Exiting...\n\n";
     return err_t::nonexistentPath;
   }
 
   if (!stdfs::is_directory(readPath)) {
-    std::cerr << "Path '" << readPath.string()
-              << "' is not a directory.\n"
+    std::cerr << "Path `" << readPath.string()
+              << "` is not a directory.\n"
                  "Exiting...\n\n";
     return err_t::nonexistentPath;
   }
@@ -49,7 +49,7 @@ err_t autoConf(const std::vector<bool> &flags,
     }
   }
 
-  writeConfig(items, err);
+  writeConfig(items, err, exePath);
 
   return err_t::errSuccess;
 }

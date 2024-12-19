@@ -14,7 +14,11 @@ enum flag_t : uint64_t {
 
   // Create config from an existing file
   input = 1,
-  flagSize,
+
+  // Select global configuration, for use or otherwise
+  global = 2,
+
+  flagSize = 3,
 };
 
 enum err_t : uint64_t {
@@ -29,6 +33,7 @@ enum err_t : uint64_t {
 
   // Autoconf errors
   nonexistentPath,
+  creationError,
 
   // JSON errors
   missingContents,
