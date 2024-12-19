@@ -6,7 +6,8 @@
 
 #include "enum.hh"
 
-err_t initialise(const std::vector<bool> &flags,
+err_t initialise(const std::filesystem::path &&exePath,
+                 const std::vector<bool> &flags,
                  const std::filesystem::path &initPath, std::string &errorMsg);
 
 #endif

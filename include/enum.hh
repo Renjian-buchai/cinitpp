@@ -17,12 +17,19 @@ enum flag_t : uint64_t {
 };
 
 enum err_t : uint64_t {
+  // Main errors
   errSuccess = 0,
   invalidFlags,
   invalidPath,
   nonEmptyDir,
 
+  // Initialisation errors
   whereTfIsHome,
+
+  // Autoconf errors
+  nonexistentPath,
+
+  // JSON errors
   missingContents,
   malformedJSON,
 };

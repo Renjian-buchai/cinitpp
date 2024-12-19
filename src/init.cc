@@ -4,9 +4,10 @@
 #include <fstream>
 #include <iostream>
 
-#include "cfgReader.hh"
+#include "cfgManager.hh"
 
-err_t initialise(const std::vector<bool> &flags,
+err_t initialise(const std::filesystem::path &&exePath,
+                 const std::vector<bool> &flags,
                  const std::filesystem::path &initPath, std::string &err) {
   namespace stdfs = std::filesystem;
 
@@ -28,8 +29,9 @@ err_t initialise(const std::vector<bool> &flags,
   readConfig(toCreate, err);
 
   for (const auto &[path, content] : toCreate) {
-    char terminating = path.string().back();
-    if (terminating == '/' || terminating == '\\') {
+    std::string pathstr = path.string();
+    if (pathstr.back() == '/' ||
+        pathstr.substr(pathstr.size() - 2) == R"(\\)") {
       if (!stdfs::exists(path)) {
         stdfs::create_directories(initPath / path);
       }

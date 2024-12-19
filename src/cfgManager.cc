@@ -1,4 +1,4 @@
-#include "cfgReader.hh"
+#include "cfgManager.hh"
 
 #include <stdlib.h>
 
@@ -9,50 +9,60 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
+inline err_t getHomeDir(std::filesystem::path &configPath) {
+#if defined(__unix__)
+  configPath = std::getenv("HOME");
+  if (configPath.empty()) {
+    std::cerr << "Unable to find home directory.\n"
+                 "Please make sure your HOME environment variable is properly "
+                 "configured.\n"
+                 "Exiting...";
+    return err_t::whereTfIsHome;
+  }
+#elif defined(_WIN32)
+  configPath = std::getenv("USERPROFILE");
+
+  // Fallback in case USERPROFILE is not set.
+  if (configPath.empty()) {
+    configPath =
+        std::string(std::getenv("HOMEDRIVE")) + std::getenv("HOMEPATH");
+  }
+
+  if (configPath.empty()) {
+    std::cerr << "Unable to find home directory.\n"
+                 "We don't know what's happening here, too.\n"
+                 "Exiting...\n\n";
+    return err_t::whereTfIsHome;
+  }
+#endif
+  return err_t::errSuccess;
+}
+
 err_t readConfig(dirItems &output, std::string &err) {
   namespace stdfs = std::filesystem;
   using json = nlohmann::json;
 
   stdfs::path configPath;
 
-  if (stdfs::exists(stdfs::current_path() / ".cinitpp.json")) {
-    configPath = stdfs::current_path() / ".cinitpp.json";
-  } else {
-#if defined(__unix__)
-    configPath = std::getenv("HOME");
-    if (configPath.empty()) {
-      err += "Unable to find home directory.\n"
-             "Please make sure your HOME environment variable is properly "
-             "configured.\n"
-             "Exiting...";
-      return err_t::whereTfIsHome;
-    }
-#elif defined(_WIN32)
-    configPath = std::getenv("USERPROFILE");
-
-    // Fallback in case USERPROFILE is not set.
-    if (configPath.empty()) {
-      configPath =
-          std::string(std::getenv("HOMEDRIVE")) + std::getenv("HOMEPATH");
-    }
-
-    if (configPath.empty()) {
-      std::cerr << "Unable to find home directory.\n"
-                   "We don't know what's happening here, too.\n"
-                   "Exiting...\n\n";
-      return err_t::whereTfIsHome;
-    }
-#endif
-
-    configPath /= ".cinitpp.json";
+  if (const err_t error = getHomeDir(configPath)) {
+    return error;
   }
 
-  if (!stdfs::exists(configPath)) {
-    err += "Unable to find '.cinitpp.json' configuration file.\n"
-           "Proceeding with cinitpp's default config.\n";
+  if (stdfs::exists(configPath / ".cinitpp.json")) {
+    err += "Using user config at '" + (configPath / ".cinitpp.json").string() +
+           "'\n";
+    configPath /= ".cinitpp.json";
+  } else {
+    configPath = stdfs::current_path() / ".cinitpp.json";
+    if (!stdfs::exists(configPath)) {
+      err += "Unable to find '.cinitpp.json' configuration file.\n"
+             "Proceeding with cinitpp's default config.\n";
 
-    output = dirItemsDefault;
-    return err_t::errSuccess;
+      output = dirItemsDefault;
+      return err_t::errSuccess;
+    } else {
+      err += "Using global config at '" + (configPath).string() + "'\n";
+    }
   }
 
   json::value_type config;

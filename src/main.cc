@@ -5,6 +5,7 @@
 
 #include "enum.hh"
 #include "init.hh"
+#include "input.hh"
 
 int main(int argc [[maybe_unused]], char **argv [[maybe_unused]]) {
   namespace stdfs = std::filesystem;
@@ -62,8 +63,9 @@ int main(int argc [[maybe_unused]], char **argv [[maybe_unused]]) {
   err_t ret = err_t::errSuccess;
 
   if (flags[flag_t::input]) {
+    ret = autoConf(flags, inPath, err);
   } else {
-    ret = initialise(flags, inPath, err);
+    ret = initialise(stdfs::path(argv[0]).parent_path(), flags, inPath, err);
   }
 
   if (!flags[flag_t::force] && err != "") {
