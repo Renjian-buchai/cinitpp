@@ -4,7 +4,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "cfgManager.hh"
+#include "config/cfgReader.hh"
 
 err_t initialise(const std::filesystem::path &&exePath,
                  const std::vector<bool> &flags,

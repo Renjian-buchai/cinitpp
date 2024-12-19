@@ -1,3 +1,4 @@
+#pragma once
 #if !defined(CINITPP_INIT_HH)
 #define CINITPP_INIT_HH
 

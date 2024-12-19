@@ -1,3 +1,4 @@
+#pragma once
 #if !defined(CINITPP_CFGREADER_HH)
 #define CINITPP_CFGREADER_HH
 

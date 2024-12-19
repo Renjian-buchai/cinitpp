@@ -1,10 +1,12 @@
 #include "input.hh"
+#include "config/cfgWriter.hh"
 #include "enum.hh"
 #include <filesystem>
 #include <fstream>
 
 err_t autoConf(const std::vector<bool> &flags,
-               const std::filesystem::path &readPath, std::string &err) {
+               const std::filesystem::path &readPath, std::string &err,
+               const std::filesystem::path &exePath) {
   namespace stdfs = std::filesystem;
 
   if (!stdfs::exists(readPath)) {
@@ -39,6 +41,7 @@ err_t autoConf(const std::vector<bool> &flags,
         std::ifstream input(it.path().string(),
                             std::ios::in | std::ios_base::binary);
         std::string buffer;
+
         input >> buffer;
 
         items.emplace_back(it.path().lexically_relative(readPath), buffer);
@@ -46,7 +49,7 @@ err_t autoConf(const std::vector<bool> &flags,
     }
   }
 
-  std::cout << nlohmann::json(items);
+  writeConfig(items, err);
 
   return err_t::errSuccess;
 }
