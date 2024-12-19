@@ -1,23 +1,23 @@
 #include "input.hh"
 #include "config/cfgWriter.hh"
 #include "enum.hh"
+#include "inputData.hh"
 #include <filesystem>
 #include <fstream>
 
-err_t autoConf(const std::vector<bool> &flags,
-               const std::filesystem::path &readPath, std::string &err,
-               const std::filesystem::path &exePath) {
+err_t autoConf(const std::vector<bool> &flags, const inputData_t &inputData,
+               std::string &err) {
   namespace stdfs = std::filesystem;
 
-  if (!stdfs::exists(readPath)) {
-    std::cerr << "Path `" << readPath.string()
+  if (!stdfs::exists(inputData.inputPath)) {
+    std::cerr << "Path `" << inputData.inputPath.string()
               << "` does not exist\n"
                  "Exiting...\n\n";
     return err_t::nonexistentPath;
   }
 
-  if (!stdfs::is_directory(readPath)) {
-    std::cerr << "Path `" << readPath.string()
+  if (!stdfs::is_directory(inputData.inputPath)) {
+    std::cerr << "Path `" << inputData.inputPath.string()
               << "` is not a directory.\n"
                  "Exiting...\n\n";
     return err_t::nonexistentPath;
@@ -26,12 +26,13 @@ err_t autoConf(const std::vector<bool> &flags,
   dirItems items;
 
   for (const stdfs::directory_entry &it :
-       stdfs::recursive_directory_iterator(readPath)) {
+       stdfs::recursive_directory_iterator(inputData.inputPath)) {
     if (stdfs::is_directory(it)) {
       if (stdfs::is_empty(it)) {
-        items.emplace_back(it.path().lexically_relative(readPath).string() +
-                               stdfs::path("/").make_preferred().string(),
-                           "");
+        items.emplace_back(
+            it.path().lexically_relative(inputData.inputPath).string() +
+                stdfs::path("/").make_preferred().string(),
+            "");
       } else {
         // If it's not empty, we can get the path from its children anyways.
         continue;
@@ -44,12 +45,13 @@ err_t autoConf(const std::vector<bool> &flags,
 
         input >> buffer;
 
-        items.emplace_back(it.path().lexically_relative(readPath), buffer);
+        items.emplace_back(it.path().lexically_relative(inputData.inputPath),
+                           buffer);
       }
     }
   }
 
-  writeConfig(items, err, exePath);
+  writeConfig(items, err, inputData.exePath);
 
   return err_t::errSuccess;
 }

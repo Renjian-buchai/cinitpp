@@ -18,7 +18,10 @@ enum flag_t : uint64_t {
   // Select global configuration, for use or otherwise
   global = 2,
 
-  flagSize = 3,
+  // Config
+  config = 3,
+
+  flagSize = 4,
 };
 
 enum err_t : uint64_t {

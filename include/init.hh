@@ -2,13 +2,12 @@
 #if !defined(CINITPP_INIT_HH)
 #define CINITPP_INIT_HH
 
-#include <filesystem>
 #include <vector>
 
 #include "enum.hh"
+#include "inputData.hh"
 
-err_t initialise(const std::filesystem::path &exePath,
-                 const std::vector<bool> &flags,
-                 const std::filesystem::path &initPath, std::string &errorMsg);
+err_t initialise(const std::vector<bool> &flags, const inputData_t &initPath,
+                 std::string &errorMsg);
 
 #endif

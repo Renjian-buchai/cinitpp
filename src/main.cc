@@ -7,17 +7,19 @@
 #include "init.hh"
 #include "input.hh"
 
+#include "inputData.hh"
+
 int main(int argc [[maybe_unused]], char **argv [[maybe_unused]]) {
   namespace stdfs = std::filesystem;
   std::vector<bool> flags(flag_t::flagSize);
 
-  stdfs::path inPath = "";
+  inputData_t inputData;
 
   std::string err = "";
 
   for (int i = 1; i < argc; ++i) {
     if (argv[i][0] != '-') {
-      inPath = argv[i];
+      inputData.inputPath = argv[i];
       continue;
     }
 
@@ -32,7 +34,7 @@ int main(int argc [[maybe_unused]], char **argv [[maybe_unused]]) {
       flags[flag_t::input] = true;
 
       if (++i < argc) {
-        inPath = stdfs::path(argv[i]);
+        inputData.inputPath = stdfs::path(argv[i]);
       } else {
         std::cout << "No path provided.\n"
                   << "Using path `" + stdfs::current_path().string() + "`.\n";
@@ -42,6 +44,18 @@ int main(int argc [[maybe_unused]], char **argv [[maybe_unused]]) {
     case 'g':
     globalFlag:
       flags[flag_t::global] = true;
+      break;
+
+    case 'c':
+    configFlag:
+      flags[flag_t::config] = true;
+
+      if (++i < argc) {
+        inputData.configIdentifier = argv[i];
+      } else {
+        std::cout << "No config identifier provided.\n"
+                     "Using config `Default`.\n";
+      }
       break;
 
     default:
@@ -59,6 +73,10 @@ int main(int argc [[maybe_unused]], char **argv [[maybe_unused]]) {
         goto globalFlag;
       }
 
+      if (option == "--config") {
+        goto configFlag;
+      }
+
       err += "Invalid argument: `" + option +
              "`;\n"
              "Ignoring...\n";
@@ -66,8 +84,8 @@ int main(int argc [[maybe_unused]], char **argv [[maybe_unused]]) {
     }
   }
 
-  if (inPath == "") {
-    inPath = stdfs::current_path();
+  if (inputData.inputPath == "") {
+    inputData.inputPath = stdfs::current_path();
   }
 
   if (!flags[flag_t::force] && err != "") {
@@ -79,16 +97,16 @@ int main(int argc [[maybe_unused]], char **argv [[maybe_unused]]) {
 
   err_t ret = err_t::errSuccess;
 
-  const auto exePath = stdfs::path(argv[0]).parent_path();
+  inputData.exePath = stdfs::path(argv[0]).parent_path();
 
   if (flags[flag_t::input]) {
-    ret = autoConf(flags, inPath, err, flags[flag_t::global] ? exePath : "");
+    ret = autoConf(flags, inputData, err);
   } else {
-    ret = initialise(exePath, flags, inPath, err);
+    ret = initialise(flags, inputData, err);
   }
 
   if (!flags[flag_t::force] && err != "") {
-    std::cerr << err << "\n";
+    std::cerr << err;
   }
 
   return ret;

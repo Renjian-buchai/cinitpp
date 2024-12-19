@@ -40,7 +40,7 @@ err_t readConfig(const std::filesystem::path &exePath, dirItems &output,
       output = dirItemsDefault;
       return err_t::errSuccess;
     } else {
-      err += "Using global config at `" + configPath.string() + "`";
+      err += "Using global config at `" + configPath.string() + "`\n";
     }
   }
 
