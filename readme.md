@@ -13,6 +13,7 @@ Initialise your C++ projects easily with cinitpp!
     - [Configuration](#configuration)
   - [Limitations](#limitations)
   - [Dependencies](#dependencies)
+  - [Future plans (So I don't forget)](#future-plans-so-i-dont-forget)
 
 ## License
 
@@ -102,3 +103,9 @@ Due to my inability to give a shit and std::filesystem's substandard design choi
 ## Dependencies
 
 - nlohmann/json 3.11.0
+
+## Future plans (So I don't forget)
+
+- Add a way to select the config from the config file
+- Add a way to overwrite the config if the name is the same
+- ? Use a faster json library
