@@ -45,6 +45,10 @@ JSON config format:
 
 ## Usage
 
+```pwsh
+cinitpp [-I | --input] <path> [-g | --global] [-f | --force] [-c | --config [identifier]]
+```
+
 ### Initialisation
 
 To initialise, use the following command:
@@ -122,6 +126,7 @@ Due to my inability to give a shit and std::filesystem's substandard design choi
 
 ## Future plans (So I don't forget)
 
+- Add help menu
 - Add a way to select the config from the config file
 - Add a way to overwrite the config if the name is the same
 - ? Use a faster json library
