@@ -3,6 +3,6 @@
 
 #include "enum.hh"
 
-err_t readConfig(dirItems& output, std::string& err);
+err_t readConfig(dirItems &output, std::string &err);
 
 #endif

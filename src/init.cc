@@ -6,8 +6,8 @@
 
 #include "cfgReader.hh"
 
-err_t initialise(const std::vector<bool>& flags,
-                 const std::filesystem::path& initPath, std::string& err) {
+err_t initialise(const std::vector<bool> &flags,
+                 const std::filesystem::path &initPath, std::string &err) {
   namespace stdfs = std::filesystem;
 
   if (!stdfs::is_directory(initPath) || !stdfs::exists(initPath)) {
@@ -27,7 +27,7 @@ err_t initialise(const std::vector<bool>& flags,
   dirItems toCreate{};
   readConfig(toCreate, err);
 
-  for (const auto& [path, content] : toCreate) {
+  for (const auto &[path, content] : toCreate) {
     char terminating = path.string().back();
     if (terminating == '/' || terminating == '\\') {
       if (!stdfs::exists(path)) {

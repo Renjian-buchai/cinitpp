@@ -1,4 +1,3 @@
-#include <cstdint>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -7,7 +6,7 @@
 #include "enum.hh"
 #include "init.hh"
 
-int main(int argc [[maybe_unused]], char** argv [[maybe_unused]]) {
+int main(int argc [[maybe_unused]], char **argv [[maybe_unused]]) {
   namespace stdfs = std::filesystem;
   std::vector<bool> flags(flag_t::flagSize);
 
@@ -22,30 +21,30 @@ int main(int argc [[maybe_unused]], char** argv [[maybe_unused]]) {
     }
 
     switch (argv[i][1]) {
-      case 'F':
-        [[fallthrough]];
-      case 'f':
-        flags[flag_t::force] = true;
-        break;
+    case 'F':
+      [[fallthrough]];
+    case 'f':
+      flags[flag_t::force] = true;
+      break;
 
-      case 'I':
-        [[fallthrough]];
-      case 'i':
-        flags[flag_t::input] = true;
+    case 'I':
+      [[fallthrough]];
+    case 'i':
+      flags[flag_t::input] = true;
 
-        if (++i < argc) {
-          inPath = stdfs::path(argv[i]);
-        } else {
-          std::cout << "No path provided.\n"
-                    << "Using path '" + stdfs::current_path().string() + "'.\n";
-        }
-        break;
+      if (++i < argc) {
+        inPath = stdfs::path(argv[i]);
+      } else {
+        std::cout << "No path provided.\n"
+                  << "Using path '" + stdfs::current_path().string() + "'.\n";
+      }
+      break;
 
-      default:
-        err += "Invalid argument: '" + std::string(argv[i]) +
-               "';\n"
-               "Ignoring.\n";
-        break;
+    default:
+      err += "Invalid argument: '" + std::string(argv[i]) +
+             "';\n"
+             "Ignoring.\n";
+      break;
     }
   }
 

@@ -9,7 +9,7 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
-err_t readConfig(dirItems& output, std::string& err) {
+err_t readConfig(dirItems &output, std::string &err) {
   namespace stdfs = std::filesystem;
   using json = nlohmann::json;
 
@@ -21,11 +21,10 @@ err_t readConfig(dirItems& output, std::string& err) {
 #if defined(__unix__)
     configPath = std::getenv("HOME");
     if (configPath.empty()) {
-      err +=
-          "Unable to find home directory.\n"
-          "Please make sure your HOME environment variable is properly "
-          "configured.\n"
-          "Exiting...";
+      err += "Unable to find home directory.\n"
+             "Please make sure your HOME environment variable is properly "
+             "configured.\n"
+             "Exiting...";
       return err_t::whereTfIsHome;
     }
 #elif defined(_WIN32)
@@ -49,9 +48,8 @@ err_t readConfig(dirItems& output, std::string& err) {
   }
 
   if (!stdfs::exists(configPath)) {
-    err +=
-        "Unable to find '.cinitpp.json' configuration file.\n"
-        "Proceeding with cinitpp's default config.\n";
+    err += "Unable to find '.cinitpp.json' configuration file.\n"
+           "Proceeding with cinitpp's default config.\n";
 
     output = dirItemsDefault;
     return err_t::errSuccess;
@@ -64,7 +62,7 @@ err_t readConfig(dirItems& output, std::string& err) {
     std::ifstream input(configPath, std::ios::in);
     configs = nlohmann::json::parse(input);
 
-    for (const json::value_type& it : configs) {
+    for (const json::value_type &it : configs) {
       if (!it.is_object()) {
         std::cerr << "Malformed json.\n"
                      "Exiting...\n\n";
@@ -78,9 +76,8 @@ err_t readConfig(dirItems& output, std::string& err) {
     }
 
     if (config.empty()) {
-      err +=
-          "Unable to find 'Default' config.\n"
-          "Proceeding with cinitpp's default config.\n";
+      err += "Unable to find 'Default' config.\n"
+             "Proceeding with cinitpp's default config.\n";
 
       output = dirItemsDefault;
       return err_t::errSuccess;
@@ -98,7 +95,7 @@ err_t readConfig(dirItems& output, std::string& err) {
     config = config["items"];
   }
 
-  for (const auto& item : config) {
+  for (const auto &item : config) {
     if (!item.contains("path")) {
       std::cerr << "Unable to find 'path' in items.\n"
                    "Exiting...\n\n";

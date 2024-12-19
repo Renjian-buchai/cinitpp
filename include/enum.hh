@@ -28,11 +28,10 @@ enum err_t : uint64_t {
 };
 
 using dirItems = std::vector<std::pair<std::filesystem::path, std::string>>;
-#define dirItemsDefault                                                       \
-  {                                                                           \
-    {"src/main.cpp", "int main() {}"}, {"include/", ""}, {"README.md", ""}, { \
-      "CMakeLists.txt", ""                                                    \
-    }                                                                         \
-  }
+#define dirItemsDefault                                                        \
+  {{"src/main.cpp", "int main() {}"},                                          \
+   {"include/", ""},                                                           \
+   {"README.md", ""},                                                          \
+   {"CMakeLists.txt", ""}}
 
 #endif
