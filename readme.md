@@ -53,11 +53,11 @@ To initialise, use the following command:
 cinitpp
 ```
 
-To force an initialisation even when the current directory is not empty, use the flag `-F, -f, --force`
+To force an initialisation even when the current directory is not empty, use the flag `-f, --force`
 
-Note, the input directory must follow immediately after the flag `-I, -i, --input`.
+Note, the input directory must follow immediately after the flag `-I, --input`.
 
-Using the flag `-G, -g, --global` will read the configuration that's effective globally.
+Using the flag `-g, --global` will read the configuration that's effective globally.
 
 ```pwsh
 cinitpp -G
@@ -88,13 +88,13 @@ cinitpp -I <INPUT DIRECTORY>
 
 The config file will be created at your home directory by default.
 
-To create a config file that's effective globally, include the flag `-G`.
+To create a config file that's effective globally, include the flag `-g`.
 
 ```pwsh
 cinitpp -G -I <INPUT DIRECTORY> 
 ```
 
-Using config file `-F` will suppress all non-error messages (e.g., `Wrote configuration to ~/.cinitpp.json`)
+Using config file `-f` will suppress all non-error messages (e.g., `Wrote configuration to ~/.cinitpp.json`)
 
 ## Limitations
 

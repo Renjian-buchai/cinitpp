@@ -22,16 +22,12 @@ int main(int argc [[maybe_unused]], char **argv [[maybe_unused]]) {
     }
 
     switch (argv[i][1]) {
-    case 'F':
-      [[fallthrough]];
     case 'f':
     forceFlag:
       flags[flag_t::force] = true;
       break;
 
     case 'I':
-      [[fallthrough]];
-    case 'i':
     inputFlag:
       flags[flag_t::input] = true;
 
@@ -43,8 +39,6 @@ int main(int argc [[maybe_unused]], char **argv [[maybe_unused]]) {
       }
       break;
 
-    case 'G':
-      [[fallthrough]];
     case 'g':
     globalFlag:
       flags[flag_t::global] = true;
