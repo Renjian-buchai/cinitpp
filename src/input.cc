@@ -39,14 +39,16 @@ err_t autoConf(const std::vector<bool> &flags, const inputData_t &inputData,
       }
     } else {
       if (stdfs::is_regular_file(it)) {
-        std::ifstream input(it.path().string(),
-                            std::ios::in | std::ios_base::binary);
+        std::ifstream input(it.path().string());
         std::string buffer;
+        std::string contents;
 
-        input >> buffer;
+        while (std::getline(input, buffer)) {
+          contents += buffer + "\n";
+        }
 
         items.emplace_back(it.path().lexically_relative(inputData.inputPath),
-                           buffer);
+                           contents);
       }
     }
   }
