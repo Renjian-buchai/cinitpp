@@ -6,7 +6,7 @@
 struct inputData_t {
   std::filesystem::path inputPath = "";
   std::filesystem::path exePath = "";
-  std::string configIdentifier = "";
+  std::string configIdentifier = "Default";
 };
 
 #endif

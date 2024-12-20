@@ -9,16 +9,18 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
+#include "enum.hh"
+#include "inputData.hh"
 #include "util.hh"
 
-err_t readConfig(const std::filesystem::path &exePath, dirItems &output,
-                 std::string &err) {
+err_t readConfig(const inputData_t &inputData, const std::vector<bool> flags,
+                 dirItems &output, std::string &err) {
   namespace stdfs = std::filesystem;
   using json = nlohmann::json;
 
   stdfs::path configPath;
 
-  if (exePath != "") {
+  if (flags[flag_t::global]) {
     goto globalBypass;
   }
 
@@ -27,12 +29,12 @@ err_t readConfig(const std::filesystem::path &exePath, dirItems &output,
   }
 
   if (stdfs::exists(configPath / ".cinitpp.json")) {
-    err += "Using user config at `" + (configPath / ".cinitpp.json").string() +
-           "`.";
+    err += "Using user config `" + inputData.configIdentifier + "` in `" +
+           (configPath / ".cinitpp.json").string() + "`.";
     configPath /= ".cinitpp.json";
   } else {
   globalBypass:
-    configPath = exePath / ".cinitpp.json";
+    configPath = inputData.exePath / ".cinitpp.json";
     if (!stdfs::exists(configPath)) {
       err += "Unable to find '.cinitpp.json' configuration file.\n"
              "Proceeding with cinitpp's default config.";
@@ -40,7 +42,8 @@ err_t readConfig(const std::filesystem::path &exePath, dirItems &output,
       output = dirItemsDefault;
       return err_t::errSuccess;
     } else {
-      err += "Using global config at `" + configPath.string() + "`\n";
+      err += "Using global config " + inputData.configIdentifier + "` in `" +
+             configPath.string() + "`\n";
     }
   }
 
@@ -59,13 +62,15 @@ err_t readConfig(const std::filesystem::path &exePath, dirItems &output,
       }
 
       if (it.contains("config") && it["config"].is_string() &&
-          it["config"].template get<std::string>() == "Default") {
+          it["config"].template get<std::string>() ==
+              inputData.configIdentifier) {
         config = it;
       }
     }
 
     if (config.empty()) {
-      err += "Unable to find 'Default' config.\n"
+      err += "Unable to find '" + inputData.configIdentifier +
+             "' config.\n"
              "Proceeding with cinitpp's default config.\n";
 
       output = dirItemsDefault;

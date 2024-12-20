@@ -27,8 +27,7 @@ err_t initialise(const std::vector<bool> &flags, const inputData_t &inputData,
   }
 
   dirItems toCreate{};
-  if (const err_t error = readConfig(
-          flags[flag_t::global] ? inputData.exePath : "", toCreate, err)) {
+  if (const err_t error = readConfig(inputData, flags, toCreate, err)) {
     return error;
   }
 
