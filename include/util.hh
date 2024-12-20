@@ -6,4 +6,10 @@
 
 err_t getHomeDir(std::filesystem::path &configPath);
 
+struct inputData_t {
+  std::filesystem::path inputPath = "";
+  std::filesystem::path exePath = "";
+  std::string configIdentifier = "Default";
+};
+
 #endif

@@ -3,7 +3,7 @@
 #define CINITPP_INPUT_HH
 
 #include "enum.hh"
-#include "inputData.hh"
+#include "util.hh"
 
 err_t autoConf(const std::vector<bool> &flags, const inputData_t &data,
                std::string &err);

@@ -7,7 +7,7 @@
 #include "init.hh"
 #include "input.hh"
 
-#include "inputData.hh"
+#include "util.hh"
 
 int main(int argc, char **argv) {
   namespace stdfs = std::filesystem;

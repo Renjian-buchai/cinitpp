@@ -1,5 +1,5 @@
 #pragma once
-#include "inputData.hh"
+#include "util.hh"
 #if !defined(CINITPP_CFGREADER_HH)
 #define CINITPP_CFGREADER_HH
 

@@ -1,7 +1,7 @@
 #include "input.hh"
 #include "config/cfgWriter.hh"
 #include "enum.hh"
-#include "inputData.hh"
+#include "util.hh"
 #include <filesystem>
 #include <fstream>
 

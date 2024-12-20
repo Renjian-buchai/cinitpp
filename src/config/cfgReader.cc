@@ -10,8 +10,8 @@
 #include <string>
 
 #include "enum.hh"
-#include "inputData.hh"
 #include "util.hh"
+
 
 err_t readConfig(const inputData_t &inputData, const std::vector<bool> flags,
                  dirItems &output, std::string &err) {

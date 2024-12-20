@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include "config/cfgReader.hh"
-#include "inputData.hh"
+#include "util.hh"
 
 err_t initialise(const std::vector<bool> &flags, const inputData_t &inputData,
                  std::string &err) {
