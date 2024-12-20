@@ -38,7 +38,8 @@ int main(int argc, const char** argv) {
   std::filesystem::path homeDir;
 
 #if defined(__unix__)
-  homeDir = std::getenv("HOME");
+  const char* dirPointer = std::getenv("HOME");
+  homeDir = dirPointer ? dirPointer : "";
   if (homeDir.empty()) {
     std::cout << "Unable to find home directory to generate configuration. "
                  "\nPlease make sure your HOME environment variable is "
@@ -46,9 +47,12 @@ int main(int argc, const char** argv) {
     return 2;
   }
 #elif defined(_WIN32)
-  homeDir = std::getenv("USERPROFILE");
+  const char* dirPointer = std::getenv("USERPROFILE");
+  homeDir = dirPointer ? dirPointer : "";
   if (homeDir.empty()) {
-    homeDir = std::string(std::getenv("HOMEDRIVE")) + std::getenv("HOMEPATH");
+    const char* homeDrive = std::getenv("HOMEDRIVE");
+    const char* homePath = std::getenv("HOMEPATH");
+    homeDir = std::string(homeDrive ? homeDrive : "") + std::getenv(homePath ? homePath : "");
   }
 #endif
 
