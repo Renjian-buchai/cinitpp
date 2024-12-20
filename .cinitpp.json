@@ -1,0 +1,22 @@
+[
+  {
+    "config":"Default",
+    "items":[
+      {
+        "path":"aoeu.txt",
+        "contents":"contents\n"
+      },
+      {
+        "path":"boeu/",
+        "contents":""
+      },
+      {
+        "path":"coeu/aoeu.txt",
+        "contents":"aoeu"
+      }
+    ]
+  }, {
+    "config":"Rubbish", 
+    "items": []
+  }
+] 
