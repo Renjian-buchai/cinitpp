@@ -110,9 +110,6 @@ int main(int argc, char **argv) {
   }
 
   if (!flags[flag_t::force] && err != "") {
-    if (ret) {
-      std::cerr << "Diagnostic: \n";
-    }
     std::cerr << err;
   }
 

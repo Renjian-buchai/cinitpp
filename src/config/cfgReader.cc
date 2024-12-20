@@ -42,7 +42,7 @@ err_t readConfig(const inputData_t &inputData, const std::vector<bool> flags,
       output = dirItemsDefault;
       return err_t::errSuccess;
     } else {
-      err += "Using global config " + inputData.configIdentifier + "` in `" +
+      err += "Using global config `" + inputData.configIdentifier + "` in `" +
              configPath.string() + "`\n";
     }
   }
@@ -69,8 +69,8 @@ err_t readConfig(const inputData_t &inputData, const std::vector<bool> flags,
     }
 
     if (config.empty()) {
-      err += "Unable to find '" + inputData.configIdentifier +
-             "' config.\n"
+      err += "Unable to find `" + inputData.configIdentifier +
+             "` config.\n"
              "Proceeding with cinitpp's default config.\n";
 
       output = dirItemsDefault;
