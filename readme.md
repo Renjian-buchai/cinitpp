@@ -2,12 +2,9 @@
 
 Initialise your C++ projects easily with cinitpp!
 
-## Currently undergoing a rewrite. Please use branch `remake` instead
-
 ## Table of contents
 
 - [cinitpp](#cinitpp)
-  - [Currently undergoing a rewrite. Please use branch `remake` instead](#currently-undergoing-a-rewrite-please-use-branch-remake-instead)
   - [Table of contents](#table-of-contents)
   - [License](#license)
   - [Documentation](#documentation)
