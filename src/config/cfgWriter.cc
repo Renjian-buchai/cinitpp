@@ -2,10 +2,10 @@
 
 #include <fstream>
 
-#include "util.hh"
+#include "enum.hh"
 
-err_t writeConfig(const dirItems &input, std::string &err,
-                  const std::filesystem::path &exePath) {
+err_t writeConfig(const dirItems &input, const inputData_t &inputData,
+                  const std::vector<bool> &flags, std::string &err) {
   namespace stdfs = std::filesystem;
   using json = nlohmann::json;
   stdfs::path configPath;
@@ -14,8 +14,8 @@ err_t writeConfig(const dirItems &input, std::string &err,
     return error;
   }
 
-  if (exePath != "") {
-    configPath = exePath;
+  if (flags[flag_t::global]) {
+    configPath = inputData.exePath;
   }
 
   json items = json::array();
@@ -33,7 +33,8 @@ err_t writeConfig(const dirItems &input, std::string &err,
     std::ifstream inputStream(configPath / ".cinitpp.json");
     config = json::parse(inputStream);
 
-    config.push_back(json::object({{"config", "aoeu"}, {"items", items}}));
+    config.push_back(json::object(
+        {{"config", inputData.configIdentifier}, {"items", items}}));
   }
 
   std::ofstream output(configPath / ".cinitpp.json");

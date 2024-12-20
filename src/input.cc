@@ -51,7 +51,7 @@ err_t autoConf(const std::vector<bool> &flags, const inputData_t &inputData,
     }
   }
 
-  writeConfig(items, err, inputData.exePath);
+  writeConfig(items, inputData, flags, err);
 
   return err_t::errSuccess;
 }
