@@ -7,7 +7,7 @@
 #include "init.hh"
 #include "input.hh"
 
-#include "inputData.hh"
+#include "util.hh"
 
 int main(int argc, char **argv) {
   namespace stdfs = std::filesystem;
@@ -110,9 +110,6 @@ int main(int argc, char **argv) {
   }
 
   if (!flags[flag_t::force] && err != "") {
-    if (ret) {
-      std::cerr << "Diagnostic: \n";
-    }
     std::cerr << err;
   }
 
