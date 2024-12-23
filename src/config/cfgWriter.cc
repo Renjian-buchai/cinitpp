@@ -33,23 +33,42 @@ err_t writeConfig(const dirItems &input, const inputData_t &inputData,
     std::ifstream inputStream(configPath / ".cinitpp.json");
     config = json::parse(inputStream);
 
+    for (json &item : config) {
+      if (item.contains("config") &&
+          item["config"] == inputData.configIdentifier &&
+          item.contains("items")) {
+        if (item["items"] == items) {
+          err += "Nothing to do.\n";
+          return err_t::errSuccess;
+        }
+
+        err += "Found existing configuration. \nUpdating...\n\n";
+        item["items"] = items;
+        goto updateBypass;
+      }
+    }
+
     config.push_back(json::object(
         {{"config", inputData.configIdentifier}, {"items", items}}));
+  updateBypass:
+    (void)0; // noop
   }
 
-  std::ofstream output(configPath / ".cinitpp.json");
-  if (!output.is_open()) {
-    std::cerr << "Unable to open or create output file.\n"
-                 "Please ensure that `"
-              << configPath
-              << "` exists, \n"
-                 "and cinitpp has the correct permissions create files in `"
-              << configPath.string()
-              << "`.\n"
-                 "Exiting...\n\n";
-    return err_t::creationError;
+  {
+    std::ofstream output(configPath / ".cinitpp.json");
+    if (!output.is_open()) {
+      std::cerr << "Unable to open or create output file.\n"
+                   "Please ensure that `"
+                << configPath
+                << "` exists, \n"
+                   "and cinitpp has the correct permissions create files in `"
+                << configPath.string()
+                << "`.\n"
+                   "Exiting...\n\n";
+      return err_t::creationError;
+    }
+    output << config.dump(2);
   }
-  output << config.dump(2);
   err += "Wrote configuration to `" + (configPath / ".cinitpp.json").string() +
          "`.\n";
 
