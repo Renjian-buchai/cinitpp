@@ -21,7 +21,11 @@ enum flag_t : uint64_t {
   // Config
   config = 3,
 
-  flagSize = 4,
+  // help
+
+  help = 4,
+
+  flagSize = 5,
 };
 
 enum err_t : uint64_t {

@@ -1,0 +1,70 @@
+#include "help.hh"
+#include <iostream>
+
+err_t dispHelp(const std::vector<bool> &flags) {
+  if (flags[flag_t::input]) {
+    std::cout //
+        << "Input:\n"
+           "Usage: cinitpp.exe (-I | --input) <path> [-g | --global]"
+           "[-f | --force] [(-c | --config) <config identifier>]\n"
+           "\n"
+           "    -I, --input   Create configuration from an existing file path. "
+           "If no configuration file exists,\n"
+           "                  it will be created.\n"
+           "    -g, --global  Updates global configuration as opposed to user "
+           "configuration.\n"
+           "                  The global configuration will be located in the "
+           "same directory as `cinitpp.exe`\n"
+           "    -f, --force   Force configuration. Ignores all non-blocking "
+           "errors\n"
+           "    -c, --config  Selects configuration identifier. Default value: "
+           "`Default`\n"
+           "                  If a configuration with that identifier already "
+           "exists, it will be overwritten\n"
+           "                  by the new value.\n\n";
+  } else {
+    std::cout //
+        << u8"Init:\n"
+           "Usage: cinitpp.exe <path> [-g | --global] [-f | --force] "
+           "[(-c | --config) <config identifier]\n"
+           "\n"
+           "Initialises directory in <path> from a configuration file. "
+           "Configuration heirarchy:\n"
+           "1. User config\n"
+           "2. Global config\n"
+           "3. Default config\n"
+           "\n"
+           "Default configuration:\n"
+           "include/\n"
+           "src/\n"
+           "    main.cpp\n"
+           "    \"int main() {}\"\n"
+           "\n"
+           "README.md\n"
+           "\"\"\n"
+           "\n"
+           "CMakeLists.txt\n"
+           "\"\"\n"
+           "\n"
+           "Flags: \n"
+           "    -g, --global  Reads global configuration as opposed to user "
+           "configuration.\n"
+           "                  The global configuration will be located in the "
+           "same directory as `cinitpp.exe`\n"
+           "    -f, --force   Force initialisation. Ignores all non-blocking "
+           "errors.\n"
+           "                  !! By forcing the initialisation, you risk "
+           "overwriting files that already exist.\n"
+           "    -c, --config  Selects configuration to read. Default value: "
+           "`Default`\n"
+           "                  If a configuration with that identifier does not "
+           "exist, it will attempt to find the `Default` configuration.\n"
+           "                  If the failure persists, it will fallback to the "
+           "default configuration.\n"
+           "\n"
+           "For further information on how to configure cinitpp, please use "
+           "`cinitpp -I -h`.\n";
+  }
+
+  return err_t::errSuccess;
+}

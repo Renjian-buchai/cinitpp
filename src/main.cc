@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "enum.hh"
+#include "help.hh"
 #include "init.hh"
 #include "input.hh"
 
@@ -40,8 +41,9 @@ int main(int argc, char **argv) {
       if (++i < argc) {
         inputData.inputPath = stdfs::path(argv[i]);
       } else {
-        std::cout << "No path provided.\n"
-                  << "Using path `" + stdfs::current_path().string() + "`.\n";
+        err += "No path provided.\n"
+               "Using path `" +
+               stdfs::current_path().string() + "`.\n";
       }
       break;
 
@@ -57,9 +59,14 @@ int main(int argc, char **argv) {
       if (++i < argc) {
         inputData.configIdentifier = argv[i];
       } else {
-        std::cout << "No config identifier provided.\n"
-                     "Using config `Default`.\n";
+        err += "No config identifier provided.\n"
+               "Using config `Default`.\n";
       }
+      break;
+
+    case 'h':
+    helpFlag:
+      flags[flag_t::help] = true;
       break;
 
     default:
@@ -79,6 +86,10 @@ int main(int argc, char **argv) {
 
       if (option == "--config") {
         goto configFlag;
+      }
+
+      if (option == "--help") {
+        goto helpFlag;
       }
 
       err += "Invalid argument: `" + option +
@@ -103,14 +114,16 @@ int main(int argc, char **argv) {
 
   inputData.exePath = stdfs::path(argv[0]).parent_path();
 
-  if (flags[flag_t::input]) {
+  if (flags[flag_t::help]) {
+    ret = dispHelp(flags);
+  } else if (flags[flag_t::input]) {
     ret = autoConf(flags, inputData, err);
   } else {
     ret = initialise(flags, inputData, err);
   }
 
-  if (!flags[flag_t::force] && err != "") {
-    std::cerr << err;
+  if (!flags[flag_t::force] && !flags[flag_t::help]) {
+    std::cout << err;
   }
 
   return ret;

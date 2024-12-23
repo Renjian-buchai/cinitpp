@@ -12,8 +12,7 @@
 #include "enum.hh"
 #include "util.hh"
 
-
-err_t readConfig(const inputData_t &inputData, const std::vector<bool> flags,
+err_t readConfig(inputData_t inputData, const std::vector<bool> flags,
                  dirItems &output, std::string &err) {
   namespace stdfs = std::filesystem;
   using json = nlohmann::json;
@@ -54,6 +53,8 @@ err_t readConfig(const inputData_t &inputData, const std::vector<bool> flags,
     std::ifstream input(configPath, std::ios::in);
     configs = nlohmann::json::parse(input);
 
+  fallback:
+
     for (const json::value_type &it : configs) {
       if (!it.is_object()) {
         std::cerr << "Malformed json.\n"
@@ -69,11 +70,18 @@ err_t readConfig(const inputData_t &inputData, const std::vector<bool> flags,
     }
 
     if (config.empty()) {
-      err += "Unable to find `" + inputData.configIdentifier +
-             "` config.\n"
-             "Proceeding with cinitpp's default config.\n";
+      if (inputData.configIdentifier != "Default") {
+        err += "Unable to find `" + inputData.configIdentifier +
+               "` config.\n"
+               "Proceeding with Default config.\n\n";
 
-      output = dirItemsDefault;
+        inputData.configIdentifier = "Default";
+        goto fallback;
+      }
+
+      err += "Unable to find `Default` config. Proceeding with .cinitpp's "
+             "default configuration.\n\n";
+      config = dirItemsDefault;
       return err_t::errSuccess;
     }
 

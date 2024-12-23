@@ -5,7 +5,7 @@
 
 #include "enum.hh"
 
-err_t readConfig(const inputData_t &inputData, const std::vector<bool> flags,
+err_t readConfig(inputData_t inputData, const std::vector<bool> flags,
                  dirItems &output, std::string &err);
 
 #endif
