@@ -126,7 +126,8 @@ Due to my inability to give a shit and std::filesystem's substandard design choi
 
 ## Future plans (So I don't forget)
 
-- Add help menu
-- Add a way to select the config from the config file
-- Add a way to overwrite the config if the name is the same
+- Add a way to add files to config directly (via cinitpp)
+- Add a way to delete configs directly
+- Add a way to delete files from config directly
+- Add -v 
 - ? Use a faster json library
